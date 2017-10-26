@@ -16,11 +16,23 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     functional.cpp \
     target.cpp \
-    emission.cpp
+    emission.cpp \
+    tracking.cpp \
+    widget.cpp
 
 HEADERS  += mainwindow.h \
     functional.h \
     target.h \
-    emission.h
+    emission.h \
+    tracking.h \
+    widget.h
 
 FORMS    += mainwindow.ui
+
+TRANSLATIONS += \
+    languages/program_ru.ts \
+    languages/program_en.ts
+
+tr.commands = lupdate \"$$_PRO_FILE_\" && lrelease \"$$_PRO_FILE_\"
+    PRE_TARGETDEPS += tr
+    QMAKE_EXTRA_TARGETS += tr

@@ -19,12 +19,18 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void setPath(QString str){this->pathFile = str;}
+    QString getPath(){return this->pathFile;}
+
+private slots:
+    void on_btnFileDialog_clicked();
 
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;
     QGraphicsEllipseItem *ellipse;
     QGraphicsRectItem *rectangle;
+    QString pathFile;
 
 };
 

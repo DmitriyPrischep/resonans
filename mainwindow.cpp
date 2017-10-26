@@ -4,6 +4,7 @@
 #include "emission.h"
 #include "functional.h"
 #include <QDebug>
+#include <QFileDialog>
 #include <ctime>
 
 float function(int value){
@@ -36,6 +37,10 @@ MainWindow::MainWindow(QWidget *parent) :
 
     Emission emis;
 
+    emis.data[120].recivers[9].signalsArr[200].x = 99;
+    emis.data[120].recivers[9].signalsArr[200].y = 33;
+
+    ui->label->setText(QString::number(emis.data[120].recivers[9].signalsArr[200].x) +  QString::number(emis.data[120].recivers[9].signalsArr[200].y));
 
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
@@ -79,4 +84,10 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::on_btnFileDialog_clicked()
+{
+    setPath(QFileDialog::getOpenFileName(this, "Open file targets", "", "*.txt"));
+    ui->editPath->setText(getPath());
 }
