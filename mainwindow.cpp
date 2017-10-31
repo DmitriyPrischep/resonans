@@ -3,8 +3,10 @@
 #include "target.h"
 #include "emission.h"
 #include "functional.h"
+#include "windowfunction.h"
 #include <QDebug>
 #include <QFileDialog>
+#include <QMessageBox>
 #include <ctime>
 
 float function(int value){
@@ -30,17 +32,6 @@ MainWindow::MainWindow(QWidget *parent) :
 {    
     ui->setupUi(this);
 
-    srand(time(NULL));
-
-    std::vector<Target> targets;
-    readDataQt(&targets);
-
-    Emission emis;
-
-    emis.data[120].recivers[9].signalsArr[200].x = 99;
-    emis.data[120].recivers[9].signalsArr[200].y = 33;
-
-    ui->label->setText(QString::number(emis.data[120].recivers[9].signalsArr[200].x) +  QString::number(emis.data[120].recivers[9].signalsArr[200].y));
 
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
@@ -90,4 +81,41 @@ void MainWindow::on_btnFileDialog_clicked()
 {
     setPath(QFileDialog::getOpenFileName(this, "Open file targets", "", "*.txt"));
     ui->editPath->setText(getPath());
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    srand(time(NULL));
+
+    std::vector<Target> targets;
+    int code = readDataQt(this->getPath(), &targets);
+    if(code != 0){
+        QMessageBox msgError;
+         if(code == 2){
+             msgError.setText(tr("Error open file"));
+             msgError.setInformativeText(tr("File does not exist"));
+             msgError.setStandardButtons(QMessageBox::Ok);
+             msgError.setDefaultButton(QMessageBox::Ok);
+             msgError.exec();
+             return;
+         }
+         msgError.setText(tr("Error open file"));
+         msgError.setInformativeText(tr("Error reading file"));
+         msgError.setStandardButtons(QMessageBox::Ok);
+         msgError.setDefaultButton(QMessageBox::Ok);
+         msgError.exec();
+         return;
+    }
+
+    Emission emis;
+    emis.data[120].recivers[9].signalsArr[200].x = 99;
+    emis.data[120].recivers[9].signalsArr[200].y = 33;
+    ui->label->setText(QString::number(emis.data[120].recivers[9].signalsArr[200].x) +  QString::number(emis.data[120].recivers[9].signalsArr[200].y));
+
+    std::vector<double> windowFunc;
+    Windowfunction::funcHammingTukey(&windowFunc);
+
+    int a;
+    a = 5;
+
 }

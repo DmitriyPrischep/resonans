@@ -5,7 +5,7 @@
     <name>MainWindow</name>
     <message>
         <location filename="../mainwindow.ui" line="14"/>
-        <source>Имитатор</source>
+        <source>Simulator</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -21,6 +21,27 @@
     <message>
         <location filename="../mainwindow.ui" line="63"/>
         <source>...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.ui" line="79"/>
+        <source>Calculate</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="95"/>
+        <location filename="../mainwindow.cpp" line="102"/>
+        <source>Error open file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="96"/>
+        <source>File does not exist</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="103"/>
+        <source>Error reading file</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

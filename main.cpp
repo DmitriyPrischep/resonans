@@ -3,8 +3,8 @@
 
 int main(int argc, char *argv[])
 {
-    QCoreApplication::setOrganizationName("org");
-    QCoreApplication::setApplicationName("app");
+    QCoreApplication::setOrganizationName("Research Institute Rezonans");
+    QCoreApplication::setApplicationName("Radar simulator");
 
     QApplication a(argc, argv);
     QTranslator traslator;

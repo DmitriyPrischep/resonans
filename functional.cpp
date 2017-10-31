@@ -4,6 +4,7 @@
 #include <QDebug>
 #include <QDataStream>
 #include "target.h"
+#include "mainwindow.h"
 
 
 int readData(std::vector<Target> *targets){
@@ -24,14 +25,14 @@ int readData(std::vector<Target> *targets){
     return 0;
 }
 
-int readDataQt(std::vector<Target> *targets){
-    QFile file("targets1.txt");
+int readDataQt(QString path, std::vector<Target> *targets){
+    QFile file(path);
     if(!file.exists()){
-        qDebug() << "File does not exist";
+        qDebug() << "File '" + path +  "' does not exist";
         return 2;
     }
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)){
-        qDebug() << "Error reading file";
+        qDebug() << "Error reading file " + path;
         return 1;
     }
     file.readLine();    // Пропускаем первую строку

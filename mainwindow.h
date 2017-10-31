@@ -25,6 +25,8 @@ public:
 private slots:
     void on_btnFileDialog_clicked();
 
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     QGraphicsScene *scene;

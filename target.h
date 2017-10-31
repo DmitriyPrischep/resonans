@@ -34,16 +34,6 @@ public:
 
     void setU(double value){ this->U = value; }
     getU(){ return this->U;}
-
-protected:
-//    inline QDataStream &operator <<(QDataStream &stream,const Target &tar) //serialization
-//    {
-////        stream >> tar.setA(stream);
-////        stream >> sC.b;
-////        stream >> sC.c;
-//        return stream;
-//    }
-
 };
 
 #endif // TARGET_H
