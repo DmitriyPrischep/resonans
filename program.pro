@@ -26,7 +26,8 @@ HEADERS  += mainwindow.h \
     emission.h \
     tracking.h \
     widget.h \
-    windowfunction.h
+    windowfunction.h \
+    configure.h
 
 FORMS    += mainwindow.ui
 

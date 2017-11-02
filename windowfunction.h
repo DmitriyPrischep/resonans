@@ -7,7 +7,7 @@
 class Windowfunction{
 public:
     static void funcHammingTukey(std::vector<double> *winFunction);
-    static void funcHamming(double *array, int size);
+    static void funcHamming(std::vector<double> *winFunction, int size);
     static void funcTukey(double *array, int size);
     static const int lenProbeSignal;
 };
@@ -28,6 +28,14 @@ void Windowfunction::funcHammingTukey(std::vector<double> *winFunction){
     }
     for(int i = 0; i < sizeW/2; i++){
         winFunction->at(i) = winFunction->at(lenProbeSignal - 1 - i) = arr[i];
+    }
+}
+
+void Windowfunction::funcHamming(std::vector<double> *winFunction, int size){
+    assert(winFunction);
+    for(int i = 0; i < size; i++){
+        winFunction->push_back(0.54 + 0.46 * cosf(2 * M_PI * (0.5+i-size*0.5)/size));
+//        array[i] = 0.54 + 0.46 * cosf(2 * M_PI * (0.5+i-size*0.5)/size);
     }
 }
 

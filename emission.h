@@ -1,10 +1,11 @@
 #ifndef EMISSION_H
 #define EMISSION_H
-#include <stddef.h>
+#include "configure.h"
+#include "stddef.h"
 
-static const int countChannels = 256;
-static const int countRecivers = 16;
-static const int countEmission = 512;
+//static const int countChannels = 256;
+//static const int countRecivers = 16;
+//static const int countEmission = 512;
 
 struct signal{
     double x;

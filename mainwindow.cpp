@@ -115,6 +115,7 @@ void MainWindow::on_pushButton_clicked()
     std::vector<double> windowFunc;
     Windowfunction::funcHammingTukey(&windowFunc);
 
+
     int a;
     a = 5;
 
