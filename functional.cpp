@@ -464,7 +464,31 @@ int calcBorder(Emission emission, struct azimuth* azimuths){
 }
 
 
-
+int marksSelection(Emission *emission, struct azimuth* azimuths, std::vector<struct mark>* marks){
+    if (!emission || !azimuths || !marks)
+        return 1;
+    for(int j = 1; j < countRecivers - 1; j++){
+        for(int k = 1; k < countChannels - 1; k++){
+            for(int i = 1; i < countEmission - 1; i++){
+                if((emission->data[i].recivers[j].signalsArr[k].x > azimuths[j].border)  //Проверка с порогом
+                        && (emission->data[i].recivers[j].signalsArr[k].x > emission->data[i].recivers[j+1].signalsArr[k].x)    // Проверка сверху
+                        && (emission->data[i].recivers[j].signalsArr[k].x > emission->data[i].recivers[j].signalsArr[k+1].x)    // Проверка сзади
+                        && (emission->data[i].recivers[j].signalsArr[k].x > emission->data[i+1].recivers[j].signalsArr[k].x)    // Проверка справа
+                        && (emission->data[i].recivers[j].signalsArr[k].x > emission->data[i].recivers[j-1].signalsArr[k].x)    // Проверка сверху
+                        && (emission->data[i].recivers[j].signalsArr[k].x > emission->data[i].recivers[j].signalsArr[k-1].x)    // Проверка спереди
+                        && (emission->data[i].recivers[j].signalsArr[k].x > emission->data[i-1].recivers[j].signalsArr[k].x)){  // Проверка слева
+                    struct mark temp;
+                    temp.i = i;
+                    temp.j = j;
+                    temp.k = k;
+                    temp.value = emission->data[i].recivers[j].signalsArr[k].x;
+                    marks->push_back(temp);
+                }
+            }
+        }
+    }
+    return 0;
+}
 
 
 

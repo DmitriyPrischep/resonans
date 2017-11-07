@@ -117,7 +117,11 @@ void MainWindow::on_pushButton_clicked()
 
     ////////////////////////////////////////
 
-    struct azimuth azimuths[countRecivers];
+    struct azimuth azimuths[countRecivers]; //ПЕРЕДЕЛАТЬ В ДИНАМИЧЕСКИЙ ВИД
+
+    std::vector<struct mark> marks;
+
+    qDebug() << "Mark size is " + marks.size();
 
 
     int a;

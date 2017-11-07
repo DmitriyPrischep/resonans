@@ -9,6 +9,14 @@ struct azimuth{
     double border;  //Порог
 };
 
+struct mark{
+    int i;
+    int j;
+    int k;
+    double value;
+    int size;
+};
+
 
 struct signal{
     double x;
