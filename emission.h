@@ -3,9 +3,12 @@
 #include "configure.h"
 #include "stddef.h"
 
-//static const int countChannels = 256;
-//static const int countRecivers = 16;
-//static const int countEmission = 512;
+struct azimuth{
+    double avg;     //Среднее арифметическое по азимуту
+    double sigma;   //Среднеквадратичное отклонение
+    double border;  //Порог
+};
+
 
 struct signal{
     double x;

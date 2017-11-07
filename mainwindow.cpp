@@ -115,6 +115,10 @@ void MainWindow::on_pushButton_clicked()
     std::vector<double> windowFunc;
     Windowfunction::funcHammingTukey(&windowFunc);
 
+    ////////////////////////////////////////
+
+    struct azimuth azimuths[countRecivers];
+
 
     int a;
     a = 5;

@@ -409,6 +409,63 @@ int dopplerFiltration(Emission* emission){
 }
 
 
+/// \brief - Вычисление порога
+/// \param [in] data - входной массив амплитуд
+/// \param [in, out] azimuths  - массив СКО и СА по каждому азимуту
+/// \param [in] cntDoplers - количество доплеров
+/// \param [in] cntAzimuth - количество направлений азимутов
+/// \param [in] cntChannels - количество каналов дальности
+int detection(Emission* emission){
+    if(!emission)
+        return 1;
+    for(int i = 0; i < countEmission; i++){
+        for(int j = 0; j < countRecivers; j++){
+            for(int k = 0; k < countChannels; k++){
+                emission->data[i].recivers[j].signalsArr[k].x = sqrt(pow(emission->data[i].recivers[j].signalsArr[k].x, 2) +
+                                                                     pow(emission->data[i].recivers[j].signalsArr[k].y, 2));
+                emission->data[i].recivers[j].signalsArr[k].y = 0;
+//                data[i].reciver[j].signals[k].x = sqrt(pow(data[i].reciver[j].signals[k].x, 2)
+//                                                       + pow(data[i].reciver[j].signals[k].y, 2));
+//                data[i].reciver[j].signals[k].y = 0;
+            }
+        }
+    }
+    return 0;
+}
+
+int calcBorder(Emission emission, struct azimuth* azimuths){
+//    cntDopllers = countEmission;
+//    cntAzimuths = countRecivers;
+//    cntChannels = countChannels;
+    if (!azimuths)
+        return 1;
+    for(int j = 0; j < countRecivers; j++){
+        double avg = 0;
+        for(int k = 0; k < countChannels; k++){
+            for(int i = 0; i < countEmission; i++){
+                avg += emission.data[i].recivers[j].signalsArr[k].x;
+//                avg += data[i].reciver[j].signals[k].x;
+            }
+        }
+        avg /= (countChannels * countEmission);
+        azimuths[j].avg = avg;
+
+        double sigma = 0;
+        for(int k = 0; k < countChannels; k++){
+            for(int i = 0; i < countEmission; i++){
+                sigma += pow(emission.data[i].recivers[j].signalsArr[k].x - avg, 2);
+//                sigma += pow(data[i].reciver[j].signals[k].x - avg, 2);
+            }
+        }
+        azimuths[j].sigma = sqrt(sigma / (countChannels * countEmission));
+        azimuths[j].border = alphaBorder * azimuths[j].avg + gammaBorder * azimuths[j].sigma;
+    }
+    return 0;
+}
+
+
+
+
 
 
 
