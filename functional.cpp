@@ -261,7 +261,97 @@ void swapping(struct signal array[], int n){
     }
 }
 
+/// \brief - Быстрое преобразование Фурье
+/// \param [in, out] in[] - входной массив комплексных чисел
+/// \param [in] n - Размерность массива
+/// \param [in] p - Направление (p > 0 - Прямое, p == 0 - Обратное)
+void fft(struct signal in[], int n, int p){
+    int half = n / 2;
+    int j = 2, i = 1, k = 1, m, c;
+    while (j <= half){
+        i = k + half;
+
+        double temp;
+        temp = in[j-1].x;
+        in[j-1].x = in[i-1].x;
+        in[i-1].x = temp;
+
+        temp = in[j-1].y;
+        in[j-1].y = in[i-1].y;
+        in[i-1].y = temp;
+
+        j++;
+        m = half / 2;
+
+        while (k > m){
+            k -= m;
+            m /= 2;
+        }
+        k += m;
+
+        if (k > j){
+            temp = in[j-1].x;
+            in[j-1].x = in[k-1].x;
+            in[k-1].x = temp;
+
+            temp = in[j-1].y;
+            in[j-1].y = in[k-1].y;
+            in[k-1].y = temp;
+
+            c = j + half + 1;
+            i = k + half + 1;
+
+            temp = in[c-1].x;
+            in[c-1].x = in[i-1].x;
+            in[i-1].x = temp;
+
+            temp = in[c-1].y;
+            in[c-1].y = in[i-1].y;
+            in[i-1].y = temp;
+        }
+        j++;
+    }
+    i = 1;
+    double t = M_PI;
+    if (p > 0)
+        t = -t;
+
+    while (i < n){
+        double im = 0,
+                re = 1,
+                Wpi = sin(t),
+                Wpr = cos(t),
+                temp;
+        t *= 0.5;
+        int cnt = i;
+        i+=i;
+        for (int h = 1; h <= cnt; h++){
+            for(int j = h; j <= n; j += i){
+               k = j + cnt;
+               double a = in[k-1].x;
+               double b = in[k-1].y;
+
+               temp = a * re - b * im;
+               in[k-1].x = in[j-1].x - temp;
+               in[j-1].x += temp;
+
+               temp = b * re + a * im;
+               in[k-1].y = in[j-1].y - temp;
+               in[j-1].y += temp;
+
+            }
+            temp = Wpr * re - Wpi * im;
+            im = Wpr * im + Wpi * re;
+            re = temp;
+        }
+    }
+    swapping(in, n);
+}
+
+
 int CFDN(Emission* emission){
+    if(!emission)
+        return 1;
     std::vector<double> windowFun;
     Windowfunction::funcHamming(&windowFun, countRecivers);
     for(int i = 0; i < countEmission; i++){
@@ -285,25 +375,44 @@ int CFDN(Emission* emission){
             }
         }
     }
-//    double *winCFDN = allocateArray(CountReceiver);
-//    HammingWindow(winCFDN, CountReceiver);
-//    for(int i = 0; i < CountEmission; i++){
-//        for(int k = 0; k < CountChannels; k++){
-//            struct signal temp[CountReceiver];
-
-//            for(int j = 0; j < CountReceiver; j++){
-//                temp[j].x = data[i].reciver[j].signals[k].x * winCFDN[j];
-//                temp[j].y = data[i].reciver[j].signals[k].y * winCFDN[j];
-//            }
-
-//            fft(temp, CountReceiver, 1);
-
-//            for(int j = 0; j < CountReceiver; j++){
-//                data[i].reciver[j].signals[k].x = temp[j].x;
-//                data[i].reciver[j].signals[k].y = temp[j].y;
-//            }
-//        }
-//    }
+    return 0;
 }
+
+int dopplerFiltration(Emission* emission){
+    if(!emission)
+        return 1;
+    std::vector<double> windowFun;
+    Windowfunction::funcHamming(&windowFun, countEmission);
+
+    for(int j = 0; j < countRecivers; j++){
+        for(int k = 0; k < countChannels; k++){
+            struct signal temp[countEmission];
+
+            for(int i = 0; i < countEmission; i++){
+                temp[i].x = emission->data[i].recivers[j].signalsArr[k].x * windowFun.at(i);
+                temp[i].y = emission->data[i].recivers[j].signalsArr[k].y * windowFun.at(i);
+//                temp[i].x = data[i].reciver[j].signals[k].x * winDopler[i];
+//                temp[i].y = data[i].reciver[j].signals[k].y * winDopler[i];
+            }
+
+            fft(temp, countEmission, 1);
+
+            for(int i = 0; i < countEmission; i++){
+                emission->data[i].recivers[j].signalsArr[k].x = temp[i].x;
+                emission->data[i].recivers[j].signalsArr[k].y = temp[i].y;
+//                data[i].reciver[j].signals[k].x = temp[i].x;
+//                data[i].reciver[j].signals[k].y = temp[i].y;
+            }
+        }
+    }
+    return 0;
+}
+
+
+
+
+
+
+
 
 

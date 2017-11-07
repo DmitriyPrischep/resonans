@@ -18,7 +18,8 @@ SOURCES += main.cpp\
     target.cpp \
     emission.cpp \
     tracking.cpp \
-    widget.cpp
+    widget.cpp \
+    windowfunction.cpp
 
 HEADERS  += mainwindow.h \
     functional.h \
