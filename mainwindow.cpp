@@ -123,8 +123,5 @@ void MainWindow::on_pushButton_clicked()
 
     qDebug() << "Mark size is " + marks.size();
 
-
-    int a;
-    a = 5;
-
+    std::vector<Target> detectTargets;
 }
