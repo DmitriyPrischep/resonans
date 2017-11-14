@@ -1,10 +1,9 @@
 #include "emission.h"
-
-//struct radio allocateEmission(int size)
+#include <QDebug>
 
 Emission::Emission()
 {
-//    this->data = allocateEmission(int size);
+
 }
 
 struct radioSignal* Emission::allocateEmission(int size){
@@ -20,5 +19,6 @@ Emission::Emission(int sizeEmission){
 }
 
 Emission::~Emission(){
+    qDebug() << "Destructor worked\n" ;
     delete[] this->data;
 }

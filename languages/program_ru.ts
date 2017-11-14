@@ -29,18 +29,33 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="95"/>
-        <location filename="../mainwindow.cpp" line="102"/>
-        <source>Error open file</source>
+        <location filename="../main.cpp" line="6"/>
+        <source>Scientific Research Institute Rezonans</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../main.cpp" line="7"/>
+        <source>Simulator radar station</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="83"/>
+        <source>Open file targets</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../mainwindow.cpp" line="96"/>
+        <location filename="../mainwindow.cpp" line="103"/>
+        <source>Error open file</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../mainwindow.cpp" line="97"/>
         <source>File does not exist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="103"/>
+        <location filename="../mainwindow.cpp" line="104"/>
         <source>Error reading file</source>
         <translation type="unfinished"></translation>
     </message>

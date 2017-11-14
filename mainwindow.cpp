@@ -32,6 +32,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {    
     ui->setupUi(this);
 
+    this->setWindowTitle(QCoreApplication::applicationName());
 
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
@@ -79,7 +80,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_btnFileDialog_clicked()
 {
-    setPath(QFileDialog::getOpenFileName(this, "Open file targets", "", "*.txt"));
+    setPath(QFileDialog::getOpenFileName(this, trUtf8("Open file targets"), "", "*.txt"));
     ui->editPath->setText(getPath());
 }
 
@@ -92,39 +93,58 @@ void MainWindow::on_pushButton_clicked()
     if(code != 0){
         QMessageBox msgError;
          if(code == 2){
-             msgError.setText(tr("Error open file"));
-             msgError.setInformativeText(tr("File does not exist"));
+             msgError.setText(trUtf8("Error open file"));
+             msgError.setInformativeText(trUtf8("File does not exist"));
              msgError.setStandardButtons(QMessageBox::Ok);
              msgError.setDefaultButton(QMessageBox::Ok);
              msgError.exec();
              return;
          }
-         msgError.setText(tr("Error open file"));
-         msgError.setInformativeText(tr("Error reading file"));
+         msgError.setText(trUtf8("Error open file"));
+         msgError.setInformativeText(trUtf8("Error reading file"));
          msgError.setStandardButtons(QMessageBox::Ok);
          msgError.setDefaultButton(QMessageBox::Ok);
          msgError.exec();
          return;
     }
 
-    Emission emis;
-    emis.data[120].recivers[9].signalsArr[200].x = 99;
-    emis.data[120].recivers[9].signalsArr[200].y = 33;
-    ui->label->setText(QString::number(emis.data[120].recivers[9].signalsArr[200].x) +  QString::number(emis.data[120].recivers[9].signalsArr[200].y));
+    Emission* emis = new Emission(countEmission);
 
     std::vector<double> windowFunc;
     Windowfunction::funcHammingTukey(&windowFunc);
 
-    QSettings *settings = new QSettings("configure.conf", QSettings::IniFormat);
-    Settings::setValues(settings);
+    imitationTargets(emis, &windowFunc, &targets);
+
+
+
+
+
+    int a;
+    a = 0;
+
+//    emis.data[120].recivers[9].signalsArr[200].x = 99;
+//    emis.data[120].recivers[9].signalsArr[200].y = 33;
+//    ui->label->setText(QString::number(emis.data[120].recivers[9].signalsArr[200].x) +  QString::number(emis.data[120].recivers[9].signalsArr[200].y));
+
+
+
+//    QSettings *settings = new QSettings("configure.conf", QSettings::IniFormat);
+//    Settings::setValues(settings);
+
+
+
+
+
 
     ////////////////////////////////////////
 
-    struct azimuth azimuths[countRecivers]; //ПЕРЕДЕЛАТЬ В ДИНАМИЧЕСКИЙ ВИД
+//    struct azimuth azimuths[countRecivers]; //ПЕРЕДЕЛАТЬ В ДИНАМИЧЕСКИЙ ВИД
 
-    std::vector<struct mark> marks;
+//    std::vector<struct mark> marks;
 
-    qDebug() << "Mark size is " + marks.size();
+//    qDebug() << "Mark size is " + marks.size();
 
-    std::vector<Target> detectTargets;
+//    std::vector<Target> detectTargets;
+
+    delete[] emis->data;
 }

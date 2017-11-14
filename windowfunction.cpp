@@ -1,6 +1,5 @@
 #include "windowfunction.h"
-
-const int Windowfunction::lenProbeSignal = 45;
+#include "configure.h"
 
 void Windowfunction::funcHammingTukey(std::vector<double> *winFunction){
     assert(winFunction);

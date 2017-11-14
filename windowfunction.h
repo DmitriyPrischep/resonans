@@ -9,7 +9,6 @@ public:
     static void funcHammingTukey(std::vector<double> *winFunction);
     static void funcHamming(std::vector<double> *winFunction, int size);
     static void funcTukey(double *array, int size);
-    static const int lenProbeSignal;
 };
 
 #endif // WINDOWFUNCTION_H

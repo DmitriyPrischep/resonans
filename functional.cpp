@@ -7,11 +7,10 @@
 #include "target.h"
 #include "emission.h"
 #include "configure.h"
-//#include "mainwindow.h"
 #include "windowfunction.h"
 
 
-int readData(std::vector<Target> *targets){
+//int readData(std::vector<Target> *targets){
 //    const int lenString = 70;
 //    const int cntStrings = 4;
 //    const char ch = '\n';
@@ -27,7 +26,7 @@ int readData(std::vector<Target> *targets){
 //    qDebug() << "File is read successfully\n";
 //    fs.close();
 //    return 0;
-}
+//}
 
 int readDataQt(QString path, std::vector<Target> *targets){
     QFile file(path);
@@ -134,7 +133,7 @@ void reflectionCoefficient(double permittivity, double conduct, double elevat, d
 /// \param [in] indexTn - Индекс канала дальности
 /// \param [in] indexReciver - Индекс антенного элемента
 /// \param [in] windowFun - Оконная функция
-void vio(Emission *emission, int indexTn, int indexReciver, int cntChannels, std::vector<double> windowFun){
+void vio(Emission *emission, int indexTn, int indexReciver, int cntChannels, std::vector<double> *windowFun){
     /////////////////////////////////// ДОПИСАТЬ ASSERT
 //    assert();
     float arg = 0;
@@ -149,10 +148,10 @@ void vio(Emission *emission, int indexTn, int indexReciver, int cntChannels, std
 
             arg = (M_PI / kl) * pow((1 + j - (kl + 1) / 2.0), 2);
 
-            c += windowFun.at(j) * (  emission->data[indexTn].recivers[indexReciver].signalsArr[k].x * cos(arg)
+            c += windowFun->at(j) * (  emission->data[indexTn].recivers[indexReciver].signalsArr[k].x * cos(arg)
                                     + emission->data[indexTn].recivers[indexReciver].signalsArr[k].y * sin(arg));
 
-            d += windowFun.at(j) * (- emission->data[indexTn].recivers[indexReciver].signalsArr[k].x * sin(arg)
+            d += windowFun->at(j) * (- emission->data[indexTn].recivers[indexReciver].signalsArr[k].x * sin(arg)
                                     + emission->data[indexTn].recivers[indexReciver].signalsArr[k].y * cos(arg));
 //            c += window_fun[j] * (arr[indexTn].reciver[indexReciver].signals[k].x * cos(arg)
 //                                  + arr[indexTn].reciver[indexReciver].signals[k].y * sin(arg));
@@ -174,7 +173,7 @@ void vio(Emission *emission, int indexTn, int indexReciver, int cntChannels, std
 /// \param [in] Tn - Период повторения сигнала
 /// \param [in] noise - Уровень шума (Sigma)
 /// \param [in] targets - Массив целей
-void imitationTargets(Emission *emission, std::vector<double> windowFun, double DF, double Tn, double noise, std::vector<Target> targets){
+void imitationTargets(Emission *emission, std::vector<double> *windowFun, std::vector<Target> *targets){
     double intervals[countRecivers];
     double heights[countRecivers];
 
@@ -184,7 +183,7 @@ void imitationTargets(Emission *emission, std::vector<double> windowFun, double 
     }
 
     double lambda = (double)300/60;
-    double dt = (double)1/DF;
+    double dt = (double)1/frequencyDeviation;
     const double piOn180 = (double)M_PI/180;
 
     for(int i = 0; i < countEmission; i++){
@@ -196,15 +195,16 @@ void imitationTargets(Emission *emission, std::vector<double> windowFun, double 
                 emission->data[i].recivers[j].signalsArr[k].y = y * noise;
 
                 for(int t = 0; t < countTargets; t++){
-                    double a = (targets.at(t).getA() <= -100) ? 0 : pow(10, (double)targets.at(t).getA()/20);
-                    double b = targets.at(t).getB();
-                    double g = targets.at(t).getG();
-                    double r = targets.at(t).getR();
-                    double f = targets.at(t).getF();
-                    double v = targets.at(t).getV();
-                    double u = targets.at(t).getU();
+                    double a = (targets->at(t).getA() <= -100) ? 0 : pow(10, (double)targets->at(t).getA()/20);
+                    double b = targets->at(t).getB();
+                    double g = targets->at(t).getG();
+                    double r = targets->at(t).getR();
+                    double f = targets->at(t).getF();
+                    double v = targets->at(t).getV();
+                    double u = targets->at(t).getU();
 
-                    double vt = r + (v * i * Tn) /1000.0 + 0.5 * (u * pow(i,2) * pow(Tn, 2)) /1000.0;
+
+                    double vt = r + (v * i * durationWave) /1000.0 + 0.5 * (u * pow(i,2) * pow(durationWave, 2)) /1000.0;
                     double time = vt / (150 * dt);
                     int begin = (int)floor(time + 0.49);
                     int end = begin + lenProbeSignal - 1;
@@ -218,9 +218,9 @@ void imitationTargets(Emission *emission, std::vector<double> windowFun, double 
 
 //                        double arg0 = 2 * M_PI/lambda * (heights[j] + HeightSea) * sin(g * piOn180);
                         double arg = 2 * M_PI/lambda * intervals[j] * sin(b * piOn180);
-                        arg += 2 * M_PI/lambda * 2 * v * i * Tn;
+                        arg += 2 * M_PI/lambda * 2 * v * i * durationWave;
                         arg += 2 * M_PI/lambda * 2 * v * (k - begin) * dt/1000.0;
-                        arg += 2 * M_PI/lambda * (u * pow(i, 2) * pow(Tn, 2)/2);
+                        arg += 2 * M_PI/lambda * (u * pow(i, 2) * pow(durationWave, 2)/2);
                         arg += 2 * M_PI/lambda * (u * pow((k - begin), 2) * pow((dt/1000.0),2));
                         arg += M_PI / lenProbeSignal * pow((0.5 + k - time - (double)lenProbeSignal/2), 2) + f;
 
@@ -235,8 +235,8 @@ void imitationTargets(Emission *emission, std::vector<double> windowFun, double 
                         double m2 = (sin(phase_x));
                         m2 += polarAmplitude * sin(phase_y);
 
-                        emission->data[i].recivers[j].signalsArr[k].x += m1 * windowFun.at(k - begin) * a;
-                        emission->data[i].recivers[j].signalsArr[k].y += m2 * windowFun.at(k - begin) * a;
+                        emission->data[i].recivers[j].signalsArr[k].x += m1 * windowFun->at(k - begin) * a;
+                        emission->data[i].recivers[j].signalsArr[k].y += m2 * windowFun->at(k - begin) * a;
 //                        data[i].reciver[j].signals[k].x += m1 * window_fun[k - begin] * a;
 //                        data[i].reciver[j].signals[k].y += m2 * window_fun[k - begin] * a;
                     }
