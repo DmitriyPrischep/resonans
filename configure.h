@@ -1,12 +1,12 @@
 #ifndef CONFIGURE
 #define CONFIGURE
-
-static const int countTargets = 4;          // Количество целей
+#include <QSettings>
 
 static const int countChannels = 256;       // Количество излучений радиосигналов
 static const int countRecivers = 16;        // Количество приемников (антенн)
 static const int countEmission = 512;       // Количество каналов дальности
 
+static const int countTargets = 4;          // Количество целей
 static const int countParametrs = 7;        // Количество параметров цели
 static const int heightSea = 0;             // Высота станции относительно уровня моря
 static const int permittivity = 20.0;       // Диэлектрическая проницаемость влажной почвы
@@ -20,6 +20,12 @@ static const int durationWave = 0.01;       // Период повторения
 static const int lenProbeSignal = 45;       // Длина зондирующего сигнала
 static const int alphaBorder = 2.1;         // Альфа коэффициент порога
 static const int gammaBorder = 5;           // Гамма коэффициент порога
+
+class Settings{
+public:
+    static void setValues(QSettings *settings);
+    static void getValues(QSettings *settings);
+};
 
 #endif // CONFIGURE
 

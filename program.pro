@@ -18,7 +18,8 @@ SOURCES += main.cpp\
     target.cpp \
     emission.cpp \
     widget.cpp \
-    windowfunction.cpp
+    windowfunction.cpp \
+    configure.cpp
 
 HEADERS  += mainwindow.h \
     functional.h \

@@ -115,6 +115,9 @@ void MainWindow::on_pushButton_clicked()
     std::vector<double> windowFunc;
     Windowfunction::funcHammingTukey(&windowFunc);
 
+    QSettings *settings = new QSettings("configure.conf", QSettings::IniFormat);
+    Settings::setValues(settings);
+
     ////////////////////////////////////////
 
     struct azimuth azimuths[countRecivers]; //ПЕРЕДЕЛАТЬ В ДИНАМИЧЕСКИЙ ВИД
