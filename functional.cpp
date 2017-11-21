@@ -254,12 +254,12 @@ void imitationTargets(Emission *emission, std::vector<double> *windowFun, std::v
 ///\brief - перестановка половинок массива
 ///\param [in, out] array[] - массив комплексных чисел
 ///\param [in] n - размер массива
-void swapping(struct signal array[], int n){
+void swapping(struct _signal array[], int n){
     assert(n > 0);
     assert(!array);
     int part = n / 2;
     for(int i = 0; i < part; i++){
-        struct signal temp;
+        struct _signal temp;
         temp.x = array[i].x;
         array[i].x = array[part + i].x;
         array[part + i].x = temp.x;
@@ -274,7 +274,7 @@ void swapping(struct signal array[], int n){
 /// \param [in, out] in[] - входной массив комплексных чисел
 /// \param [in] n - Размерность массива
 /// \param [in] p - Направление (p > 0 - Прямое, p == 0 - Обратное)
-void fft(struct signal in[], int n, int p){
+void fft(struct _signal in[], int n, int p){
     int half = n / 2;
     int j = 2, i = 1, k = 1, m, c;
     while (j <= half){
@@ -367,7 +367,7 @@ int CFDN(Emission* emission){
     Windowfunction::funcHamming(&windowFun, countRecivers);
     for(int i = 0; i < countEmission; i++){
         for(int k = 0; k < countChannels; k++){
-            struct signal temp[countRecivers];
+            struct _signal temp[countRecivers];
 
             for(int j = 0; j < countRecivers; j++){
                 temp[j].x = emission->data[i].recivers[j].signalsArr[k].x * windowFun.at(j);
@@ -399,7 +399,7 @@ int dopplerFiltration(Emission* emission){
 
     for(int j = 0; j < countRecivers; j++){
         for(int k = 0; k < countChannels; k++){
-            struct signal temp[countEmission];
+            struct _signal temp[countEmission];
 
             for(int i = 0; i < countEmission; i++){
                 temp[i].x = emission->data[i].recivers[j].signalsArr[k].x * windowFun.at(i);
@@ -562,6 +562,28 @@ int evalCoordinatesMarks(Emission emission, std::vector<struct mark>* marks, std
     return 0;
 }
 
+
+void verticalImitation(std::vector<struct _signal>* array, double elevat){
+    double phase = 45;
+    int Nb = 8;
+    double E0 = 50;
+    double lambda = (double)300/60;
+    double k0 = 2 * M_PI / lambda;
+
+    double polarPhase = 0;
+    double polarAmplitude = 0;
+    reflectionCoefficient(permittivity, conduct, elevat, lambda, &polarAmplitude, &polarPhase);
+
+    for(int i = 0; i < Nb; i++){
+        double arg = - k0 * xn[i] * sin(elevat) * phase/A;
+        double arg0 = k0 * xn[i] * sin(elevat) * phase/A;
+        struct _signal temp;
+        temp.x = E0 * (cos(arg) + polarAmplitude * cos(arg0 + polarPhase/A));
+        temp.y = E0 * (sin(arg) + polarAmplitude * sin(arg0 + polarPhase/A));
+        array->push_back(temp);
+
+    }
+}
 
 
 

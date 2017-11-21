@@ -18,12 +18,12 @@ struct mark{
 };
 
 
-struct signal{
+struct _signal{
     double x;
     double y;
 };
 struct reciver{
-    struct signal signalsArr[countChannels];
+    struct _signal signalsArr[countChannels];
 };
 
 struct radioSignal{

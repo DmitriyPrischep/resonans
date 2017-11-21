@@ -33,6 +33,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     this->setWindowTitle(QCoreApplication::applicationName());
+    ui->lblPath->setText(trUtf8("File targets:"));
 
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
