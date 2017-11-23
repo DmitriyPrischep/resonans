@@ -20,6 +20,9 @@ static const int durationWave = 0.01;       // Период повторения
 static const int lenProbeSignal = 45;       // Длина зондирующего сигнала
 static const int alphaBorder = 2.1;         // Альфа коэффициент порога
 static const int gammaBorder = 5;           // Гамма коэффициент порога
+static const int cntVertAE = 8;             // Количество антенных элементов на вертикальной антенной решетке
+static const double anten[cntVertAE]        // Высоты каждого элемента
+    = {2.5, 5, 7.5, 10, 13.8, 17.2, 20.6, 24};
 
 class Settings{
 public:

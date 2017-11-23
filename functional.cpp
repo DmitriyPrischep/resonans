@@ -565,26 +565,72 @@ int evalCoordinatesMarks(Emission emission, std::vector<struct mark>* marks, std
 
 void verticalImitation(std::vector<struct _signal>* array, double elevat){
     double phase = 45;
-    int Nb = 8;
     double E0 = 50;
     double lambda = (double)300/60;
-    double k0 = 2 * M_PI / lambda;
+    double koef = 2 * M_PI / lambda;
+    double param = 180./M_PI;
 
     double polarPhase = 0;
     double polarAmplitude = 0;
     reflectionCoefficient(permittivity, conduct, elevat, lambda, &polarAmplitude, &polarPhase);
 
-    for(int i = 0; i < Nb; i++){
-        double arg = - k0 * xn[i] * sin(elevat) * phase/A;
-        double arg0 = k0 * xn[i] * sin(elevat) * phase/A;
+    for(int i = 0; i < cntVertAE; i++){
+        double arg = - koef * anten[i] * sin(elevat) * phase/param;
+        double arg0 = koef * anten[i] * sin(elevat) * phase/param;
         struct _signal temp;
-        temp.x = E0 * (cos(arg) + polarAmplitude * cos(arg0 + polarPhase/A));
-        temp.y = E0 * (sin(arg) + polarAmplitude * sin(arg0 + polarPhase/A));
+        temp.x = E0 * (cos(arg) + polarAmplitude * cos(arg0 + polarPhase/param));
+        temp.y = E0 * (sin(arg) + polarAmplitude * sin(arg0 + polarPhase/param));
         array->push_back(temp);
-
     }
 }
 
+void CFDN(std::vector<struct _signal>* array, double *elevat, double *amplitude){
+    double max = 0;
+    double lambda = 300./60.;
+    for(double i = 0; i < 90; i += 0.1){
+        double p = 0;
+        double pp = 0;
+        for(int j = 0; i < cntVertAE; i++){
+            double arg = (2 * M_PI/lambda) * anten[j]*sin(i);
+            double co = cos(arg);
+            double si = sin(arg);
+
+            p = p - array->at(j).x * co + array->at(j).y * si;
+            pp = pp + array->at(j).x * si + array->at(j).y * co;
+        }
+        double tempAmpl = sqrt(pow(p, 2) + pow(pp, 2));
+        if(tempAmpl > max){
+            *elevat = i;
+            *amplitude = max = tempAmpl;
+        }
+    }
+}
+
+void MX(std::vector<struct _signal>* array, double *elevat, double *amplitude){
+    for(double angle = 0; angle < 90; angle += 0.1){
+        double tt = 0;
+        for(int i = 0; i < cntVertAE; i++){
+            double pp = fabs(swh[].x - sw[i].x);
+            p = pp * pp;
+            tt = tt + p;
+        }
+        for (int i = 0; i < cntVertAE; i++){
+            double pp = fabs(swh[].y - sw[i].y);
+            p = pp * pp;
+            tt = tt + p;
+        }
+
+        if (tt > 0)
+            p = 1./tt;
+        else
+            p = 0;
+
+        if(p > AMX){
+            Amx = AMX = p;
+            *elevat = angle;
+        }
+    }
+}
 
 
 
