@@ -34,43 +34,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     this->setWindowTitle(QCoreApplication::applicationName());
     ui->lblPath->setText(trUtf8("File targets:"));
-
-    scene = new QGraphicsScene(this);
-    ui->graphicsView->setScene(scene);
-
-//    QBrush redBrush(Qt::red);
-//    QBrush greenBrush(Qt::green);
-//    QPen blackPen(Qt::black);
-////    blackPen.setWidth(6);
-
-//    int centerX = scene->width() / 2;
-//    int centerY = scene->height() / 2;
-
-//    scene->addEllipse(centerX- 350, centerY - 350, 700, 700, blackPen);
-//    scene->addEllipse(centerX - 250, centerY - 250, 500, 500, blackPen);
-//    scene->addEllipse(centerX - 150, centerY - 150, 300, 300, blackPen);
-
-//    int x1 = 350;
-//    int y1 = 0;
-//    int x2 = -350;
-//    int y2 = 0;
-//    scene->addLine(x1, y1, x2, y2);
-//    for(int i = 0; i < 5; i++){
-//        rotatePoint(&x1, &y1, x1, y1, centerX, centerY, 30);
-//        rotatePoint(&x2, &y2, x2, y2, centerX, centerY, 30);
-//        scene->addLine(x1, y1, x2, y2);
-//    }
-
-//    scene->addEllipse(centerX - 4, centerY - 4, 8, 8, blackPen, greenBrush);
-
-//    //Движение цели
-//    int startX = -20;
-//    int startY = -20;
-//    for(int i = 0, j = 0; i < 100 && j < 100; i++, j+=3){
-//        scene->addEllipse(startX+i, function(startY+i), 4, 4, blackPen, redBrush);
-//    }
-
-
 }
 
 
@@ -148,4 +111,42 @@ void MainWindow::on_pushButton_clicked()
 //    std::vector<Target> detectTargets;
 
     delete[] emis->data;
+}
+
+void MainWindow::on_pushButton_2_clicked()
+{
+    scene = new QGraphicsScene(this);
+    ui->graphicsView->setScene(scene);
+
+    QBrush redBrush(Qt::red);
+    QBrush greenBrush(Qt::green);
+    QPen blackPen(Qt::black);
+//    blackPen.setWidth(6);
+
+    int centerX = scene->width() / 2;
+    int centerY = scene->height() / 2;
+
+    scene->addEllipse(centerX- 350, centerY - 350, 700, 700, blackPen);
+    scene->addEllipse(centerX - 250, centerY - 250, 500, 500, blackPen);
+    scene->addEllipse(centerX - 150, centerY - 150, 300, 300, blackPen);
+
+    int x1 = 350;
+    int y1 = 0;
+    int x2 = -350;
+    int y2 = 0;
+    scene->addLine(x1, y1, x2, y2);
+    for(int i = 0; i < 5; i++){
+        rotatePoint(&x1, &y1, x1, y1, centerX, centerY, 30);
+        rotatePoint(&x2, &y2, x2, y2, centerX, centerY, 30);
+        scene->addLine(x1, y1, x2, y2);
+    }
+
+    scene->addEllipse(centerX - 4, centerY - 4, 8, 8, blackPen, greenBrush);
+
+    //Движение цели
+    int startX = -20;
+    int startY = -20;
+    for(int i = 0, j = 0; i < 100 && j < 100; i++, j+=3){
+        scene->addEllipse(startX+i, function(startY+i), 4, 4, blackPen, redBrush);
+    }
 }

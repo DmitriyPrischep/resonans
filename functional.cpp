@@ -562,6 +562,28 @@ int evalCoordinatesMarks(Emission emission, std::vector<struct mark>* marks, std
     return 0;
 }
 
+void generateSignal(std::vector<struct _signal>* array, double elevat){
+    double phase = 45;
+    double E0 = 50;
+    double lambda = (double)300/60;
+    double koef = 2 * M_PI / lambda;
+    double param = 180./M_PI;
+
+    double polarPhase = 0;
+    double polarAmplitude = 0;
+    reflectionCoefficient(permittivity, conduct, elevat, lambda, &polarAmplitude, &polarPhase);
+
+    for(int i = 0; i < cntVertAE; i++){
+        double arg = - koef * anten[i] * sin(elevat) * phase/param;
+        double arg0 = koef * anten[i] * sin(elevat) * phase/param;
+        struct _signal temp;
+        temp.x = E0 * (cos(arg) + polarAmplitude * cos(arg0 + polarPhase/param));
+        temp.y = E0 * (sin(arg) + polarAmplitude * sin(arg0 + polarPhase/param));
+        array->push_back(temp);
+    }
+}
+
+
 
 void verticalImitation(std::vector<struct _signal>* array, double elevat){
     double phase = 45;
@@ -606,29 +628,46 @@ void CFDN(std::vector<struct _signal>* array, double *elevat, double *amplitude)
     }
 }
 
-void MX(std::vector<struct _signal>* array, double *elevat, double *amplitude){
+void MX(std::vector<struct _signal>* arrayRealSignal, double *elevat, double *amplitude){
     for(double angle = 0; angle < 90; angle += 0.1){
-        double tt = 0;
+        std::vector<struct _signal> arrayModelSignal;
+
+        generateSignal(&arrayModelSignal, angle);
+
+        double temp = 0;
         for(int i = 0; i < cntVertAE; i++){
-            double pp = fabs(swh[].x - sw[i].x);
-            p = pp * pp;
-            tt = tt + p;
-        }
-        for (int i = 0; i < cntVertAE; i++){
-            double pp = fabs(swh[].y - sw[i].y);
-            p = pp * pp;
-            tt = tt + p;
+            temp += pow(fabs(arrayModelSignal.at(i).x - arrayRealSignal->at(i).x), 2);
+            temp += pow(fabs(arrayModelSignal.at(i).y - arrayRealSignal->at(i).y), 2);
         }
 
-        if (tt > 0)
-            p = 1./tt;
-        else
-            p = 0;
+//        if  (temp > 0)
+//            p = 1. / temp;
+//        else
+//            p = 0;
 
-        if(p > AMX){
-            Amx = AMX = p;
-            *elevat = angle;
-        }
+//        if()
+
+//        double tt = 0;
+//        for(int i = 0; i < cntVertAE; i++){
+//            double pp = fabs(swh[].x - sw[i].x);
+//            p = pp * pp;
+//            tt = tt + p;
+//        }
+//        for (int i = 0; i < cntVertAE; i++){
+//            double pp = fabs(swh[].y - sw[i].y);
+//            p = pp * pp;
+//            tt = tt + p;
+//        }
+
+//        if (tt > 0)
+//            p = 1./tt;
+//        else
+//            p = 0;
+
+//        if(p > AMX){
+//            Amx = AMX = p;
+//            *elevat = angle;
+//        }
     }
 }
 
