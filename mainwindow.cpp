@@ -7,31 +7,16 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QStandardItemModel>
+#include <QStandardItem>
 #include <ctime>
-
-float function(int value){
-    return 0.6 * pow(value, 2) + 100;
-}
-
-
-int rotatePoint(int* outX, int* outY, int inX, int inY, int centerX, int centerY, int angle){
-    if (!outX || !outY){
-        return -1;
-    }
-    *outX = (int)(centerX + (inX - centerX) * cos(angle*M_PI/180) - (inY - centerY) * sin(angle*M_PI/180));
-    *outY = (int)(centerY + (inY - centerY) * cos(angle*M_PI/180) + (inX - centerX) * sin(angle*M_PI/180));
-    return 0;
-}
-
-//X = x0 + (x - x0) * cos(a) - (y - y0) * sin(a);
-//Y = y0 + (y - y0) * cos(a) + (x - x0) * sin(a);
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {    
     ui->setupUi(this);
-
+    srand(time(NULL));
     this->setWindowTitle(QCoreApplication::applicationName());
     ui->lblPath->setText(trUtf8("File targets:"));
 }
@@ -48,27 +33,71 @@ void MainWindow::on_btnFileDialog_clicked()
     ui->editPath->setText(getPath());
 }
 
+void MainWindow::initializationTable(std::vector<Target> *targets){
+    QStandardItemModel *model = new QStandardItemModel;
+    QStandardItem *item;
+
+    QStringList columnHeader;
+    columnHeader.append(trUtf8("Amplitude"));
+    columnHeader.append(trUtf8("Distanse"));
+    columnHeader.append(trUtf8("Azimuth"));
+    columnHeader.append(trUtf8("Speed"));
+    columnHeader.append(trUtf8("Start phase"));
+    columnHeader.append(trUtf8("Elevation"));
+    columnHeader.append(trUtf8("Acceleration"));
+    model->setHorizontalHeaderLabels(columnHeader);
+
+    for(unsigned int i = 0; i < targets->size(); i++){
+        item = new QStandardItem(QString::number(targets->at(i).getA()));
+        model->setItem(i, 0, item);
+
+        item = new QStandardItem(QString::number(targets->at(i).getR()));
+        model->setItem(i, 1, item);
+
+        item = new QStandardItem(QString::number(targets->at(i).getB()));
+        model->setItem(i, 2, item);
+
+        item = new QStandardItem(QString::number(targets->at(i).getV()));
+        model->setItem(i, 3, item);
+
+//        item = new QStandardItem(QString(targets->at(i).getF()));
+//        model->setItem(i, 4, item);
+
+//        item = new QStandardItem(QString(targets->at(i).getG()));
+//        model->setItem(i, 5, item);
+
+//        item = new QStandardItem(QString(targets->at(i).getU()));
+//        model->setItem(i, 6, item);
+    }
+
+    ui->tableView->setModel(model);
+
+    ui->tableView->resizeRowsToContents();
+    ui->tableView->resizeColumnsToContents();
+}
+
+void MainWindow::viewMessageBox(QString title, QString text){
+    QMessageBox msgError;
+    msgError.setWindowTitle(title);
+    msgError.setInformativeText(text);
+    msgError.setStandardButtons(QMessageBox::Ok);
+    msgError.setDefaultButton(QMessageBox::Ok);
+    QSpacerItem* horizontalSpacer = new QSpacerItem(300, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    QGridLayout* layout = (QGridLayout*)msgError.layout();
+    layout->addItem(horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
+    msgError.exec();
+}
+
 void MainWindow::on_pushButton_clicked()
 {
-    srand(time(NULL));
-
     std::vector<Target> targets;
     int code = readDataQt(this->getPath(), &targets);
     if(code != 0){
-        QMessageBox msgError;
          if(code == 2){
-             msgError.setText(trUtf8("Error open file"));
-             msgError.setInformativeText(trUtf8("File does not exist"));
-             msgError.setStandardButtons(QMessageBox::Ok);
-             msgError.setDefaultButton(QMessageBox::Ok);
-             msgError.exec();
+             viewMessageBox(trUtf8("Error open file"), trUtf8("File does not exist"));
              return;
          }
-         msgError.setText(trUtf8("Error open file"));
-         msgError.setInformativeText(trUtf8("Error reading file"));
-         msgError.setStandardButtons(QMessageBox::Ok);
-         msgError.setDefaultButton(QMessageBox::Ok);
-         msgError.exec();
+         viewMessageBox(trUtf8("Error open file"), trUtf8("Error reading file"));
          return;
     }
 
@@ -79,74 +108,44 @@ void MainWindow::on_pushButton_clicked()
 
     imitationTargets(emis, &windowFunc, &targets);
 
+    CFDN(emis);
+    dopplerFiltration(emis);
+    detection(emis);
 
+    std::vector<struct azimuth> azimuths;
 
+    calcBorder(emis, &azimuths);
 
+    std::vector<struct mark> marks;
+
+    marksSelection(emis, &azimuths, &marks);
+
+    qDebug() << "  Mark size is " + marks.size();
+
+    std::vector<Target> resultTargets;
+    evalCoordinatesMarks(emis, &marks, &resultTargets);
 
     int a;
-    a = 0;
+    a = resultTargets.size();
 
-//    emis.data[120].recivers[9].signalsArr[200].x = 99;
-//    emis.data[120].recivers[9].signalsArr[200].y = 33;
-//    ui->label->setText(QString::number(emis.data[120].recivers[9].signalsArr[200].x) +  QString::number(emis.data[120].recivers[9].signalsArr[200].y));
-
+    initializationTable(&resultTargets);
 
 
 //    QSettings *settings = new QSettings("configure.conf", QSettings::IniFormat);
 //    Settings::setValues(settings);
 
-
-
-
-
-
     ////////////////////////////////////////
-
-//    struct azimuth azimuths[countRecivers]; //ПЕРЕДЕЛАТЬ В ДИНАМИЧЕСКИЙ ВИД
-
-//    std::vector<struct mark> marks;
-
-//    qDebug() << "Mark size is " + marks.size();
-
-//    std::vector<Target> detectTargets;
 
     delete[] emis->data;
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    scene = new QGraphicsScene(this);
-    ui->graphicsView->setScene(scene);
-
-    QBrush redBrush(Qt::red);
-    QBrush greenBrush(Qt::green);
-    QPen blackPen(Qt::black);
-//    blackPen.setWidth(6);
-
-    int centerX = scene->width() / 2;
-    int centerY = scene->height() / 2;
-
-    scene->addEllipse(centerX- 350, centerY - 350, 700, 700, blackPen);
-    scene->addEllipse(centerX - 250, centerY - 250, 500, 500, blackPen);
-    scene->addEllipse(centerX - 150, centerY - 150, 300, 300, blackPen);
-
-    int x1 = 350;
-    int y1 = 0;
-    int x2 = -350;
-    int y2 = 0;
-    scene->addLine(x1, y1, x2, y2);
-    for(int i = 0; i < 5; i++){
-        rotatePoint(&x1, &y1, x1, y1, centerX, centerY, 30);
-        rotatePoint(&x2, &y2, x2, y2, centerX, centerY, 30);
-        scene->addLine(x1, y1, x2, y2);
-    }
-
-    scene->addEllipse(centerX - 4, centerY - 4, 8, 8, blackPen, greenBrush);
-
-    //Движение цели
-    int startX = -20;
-    int startY = -20;
-    for(int i = 0, j = 0; i < 100 && j < 100; i++, j+=3){
-        scene->addEllipse(startX+i, function(startY+i), 4, 4, blackPen, redBrush);
-    }
+    picture = new MyGraphicsView();
+//    //Движение цели
+//    int startX = -20;
+//    int startY = -20;
+//    for(int i = 0, j = 0; i < 100 && j < 100; i++, j+=3){
+//        scene->addEllipse(startX+i, function(startY+i), 4, 4, blackPen, redBrush);
+//    }
 }

@@ -6,7 +6,9 @@
 #include <QPainter>
 #include <QtCore>
 #include <QtGui>
-#include <QGraphicsScene>
+#include "mygraphicsview.h"
+#include "target.h"
+
 
 namespace Ui {
 class MainWindow;
@@ -30,10 +32,14 @@ private slots:
     void on_pushButton_2_clicked();
 
 private:
+    void initializationTable(std::vector<Target> *targets);
+    void viewMessageBox(QString title, QString text);
     Ui::MainWindow *ui;
-    QGraphicsScene *scene;
-    QGraphicsEllipseItem *ellipse;
-    QGraphicsRectItem *rectangle;
+    MyGraphicsView *picture;
+//    QGraphicsScene *scene;
+//    QGraphicsEllipseItem *ellipse;
+//    QGraphicsRectItem *rectangle;
+
     QString pathFile;
 
 };

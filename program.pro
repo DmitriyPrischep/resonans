@@ -18,14 +18,16 @@ SOURCES += main.cpp\
     target.cpp \
     emission.cpp \
     windowfunction.cpp \
-    configure.cpp
+    configure.cpp \
+    mygraphicsview.cpp
 
 HEADERS  += mainwindow.h \
     functional.h \
     target.h \
     emission.h \
     windowfunction.h \
-    configure.h
+    configure.h \
+    mygraphicsview.h
 
 FORMS    += mainwindow.ui
 

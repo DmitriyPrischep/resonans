@@ -20,3 +20,7 @@ void Settings::setValues(QSettings *settings){
     settings->setValue("radar/gammaBorder", 5);
     settings->sync();
 }
+
+void Settings::getValues(QSettings *settings){
+
+}

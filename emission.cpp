@@ -1,9 +1,7 @@
 #include "emission.h"
 #include <QDebug>
 
-Emission::Emission()
-{
-
+Emission::Emission(){
 }
 
 struct radioSignal* Emission::allocateEmission(int size){

@@ -9,24 +9,10 @@
 #include "configure.h"
 #include "windowfunction.h"
 
+//int writeDataQt(QString path){
 
-//int readData(std::vector<Target> *targets){
-//    const int lenString = 70;
-//    const int cntStrings = 4;
-//    const char ch = '\n';
-//    char mass[lenString][cntStrings];
-
-//    std::ifstream fs("targets1.txt", std::ios::in | std::ios::binary);
-//    if(!fs) return 1;
-
-//    for(int i = 0; i < cntStrings; i++){
-//        fs.getline(mass[i], lenString-1, ch);
-//        std::cerr << "String" << i + 1 << " = " << mass[i] <<endl;
-//    }
-//    qDebug() << "File is read successfully\n";
-//    fs.close();
-//    return 0;
 //}
+
 
 int readDataQt(QString path, std::vector<Target> *targets){
     QFile file(path);
@@ -256,7 +242,6 @@ void imitationTargets(Emission *emission, std::vector<double> *windowFun, std::v
 ///\param [in] n - размер массива
 void swapping(struct _signal array[], int n){
     assert(n > 0);
-    assert(!array);
     int part = n / 2;
     for(int i = 0; i < part; i++){
         struct _signal temp;
@@ -445,29 +430,29 @@ int detection(Emission* emission){
 /// \brief - Вычисление порога
 /// \param [in] data - Входной массив амплитуд
 /// \param [in, out] azimuths  - Массив СКО и СА по каждому азимуту
-int calcBorder(Emission emission, struct azimuth* azimuths){
+int calcBorder(Emission *emission, std::vector<struct azimuth> *azimuths){
     if (!azimuths)
         return 1;
     for(int j = 0; j < countRecivers; j++){
         double avg = 0;
         for(int k = 0; k < countChannels; k++){
             for(int i = 0; i < countEmission; i++){
-                avg += emission.data[i].recivers[j].signalsArr[k].x;
-//                avg += data[i].reciver[j].signals[k].x;
+                avg += emission->data[i].recivers[j].signalsArr[k].x;
             }
         }
+        struct azimuth temp;
         avg /= (countChannels * countEmission);
-        azimuths[j].avg = avg;
+        temp.avg = avg;
 
         double sigma = 0;
         for(int k = 0; k < countChannels; k++){
             for(int i = 0; i < countEmission; i++){
-                sigma += pow(emission.data[i].recivers[j].signalsArr[k].x - avg, 2);
-//                sigma += pow(data[i].reciver[j].signals[k].x - avg, 2);
+                sigma += pow(emission->data[i].recivers[j].signalsArr[k].x - avg, 2);
             }
         }
-        azimuths[j].sigma = sqrt(sigma / (countChannels * countEmission));
-        azimuths[j].border = alphaBorder * azimuths[j].avg + gammaBorder * azimuths[j].sigma;
+        temp.sigma = sqrt(sigma / (countChannels * countEmission));
+        temp.border = alphaBorder * temp.avg + gammaBorder * temp.sigma;
+        azimuths->push_back(temp);
     }
     return 0;
 }
@@ -476,13 +461,13 @@ int calcBorder(Emission emission, struct azimuth* azimuths){
 /// \param [in, out] emission  - Свертка сигнала
 /// \param [in] azimuths  - Массив СКО и СА по каждому азимуту
 /// \param [in, out] marks - Выходной массив отметок, значение которого превышает порог border
-int marksSelection(Emission *emission, struct azimuth* azimuths, std::vector<struct mark>* marks){
+int marksSelection(Emission *emission, std::vector<struct azimuth> *azimuths, std::vector<struct mark>* marks){
     if (!emission || !azimuths || !marks)
         return 1;
     for(int j = 1; j < countRecivers - 1; j++){
         for(int k = 1; k < countChannels - 1; k++){
             for(int i = 1; i < countEmission - 1; i++){
-                if((emission->data[i].recivers[j].signalsArr[k].x > azimuths[j].border)  //Проверка с порогом
+                if((emission->data[i].recivers[j].signalsArr[k].x > azimuths->at(j).border)  //Проверка с порогом
                         && (emission->data[i].recivers[j].signalsArr[k].x > emission->data[i].recivers[j+1].signalsArr[k].x)    // Проверка сверху
                         && (emission->data[i].recivers[j].signalsArr[k].x > emission->data[i].recivers[j].signalsArr[k+1].x)    // Проверка сзади
                         && (emission->data[i].recivers[j].signalsArr[k].x > emission->data[i+1].recivers[j].signalsArr[k].x)    // Проверка справа
@@ -507,8 +492,8 @@ int marksSelection(Emission *emission, struct azimuth* azimuths, std::vector<str
 /// \param [in] emission  - Свертка сигнала
 /// \param [in] marks - Массив отметок
 /// \param [in, out] targets - Выходной массив целей с характеристиками
-int evalCoordinatesMarks(Emission emission, std::vector<struct mark>* marks, std::vector<Target> *targets){
-    if(!marks || !targets)
+int evalCoordinatesMarks(Emission *emission, std::vector<struct mark>* marks, std::vector<Target> *targets){
+    if(!marks || !targets || !emission)
         return 1;
 
     unsigned int n = 0;
@@ -519,44 +504,33 @@ int evalCoordinatesMarks(Emission emission, std::vector<struct mark>* marks, std
 
     while (n < marks->size()){
         double sum1 = 0, sum2 = 0;
+        Target temp;
         for(int p = -1; p < 2; p++){
-            sum1 += emission.data[marks->at(n).i + p].recivers[marks->at(n).j].signalsArr[marks->at(n).k].x * (marks->at(n).i + p);
-            sum2 += emission.data[marks->at(n).i + p].recivers[marks->at(n).j].signalsArr[marks->at(n).k].x;
-//            sum1 += data[marks[n].i + p].reciver[marks[n].j].signals[marks[n].k].x * (marks[n].i + p);
-//            sum2 += data[marks[n].i + p].reciver[marks[n].j].signals[marks[n].k].x;
-//            printf("%d)\t%d\t%d\t%d\t%d\t%lf\n", n, p, marks[n].i, marks[n].j, marks[n].k, data[marks[n].i + p].reciver[marks[n].j].signals[marks[n].k].x);
+            sum1 += emission->data[marks->at(n).i + p].recivers[marks->at(n).j].signalsArr[marks->at(n).k].x * (marks->at(n).i + p);
+            sum2 += emission->data[marks->at(n).i + p].recivers[marks->at(n).j].signalsArr[marks->at(n).k].x;
         }
-//        printf("\n");
         velocity = sum1 / sum2;
-        targets->at(n).setV(lambda / 2 * velocity *((1.0/durationWave)/countEmission));
-//        targets[n].V = ;
+        temp.setV(lambda / 2 * velocity *((1.0/durationWave)/countEmission));
 
         sum1 = sum2 = 0;
         for(int p = -1; p < 2; p++){
-            sum1 += emission.data[marks->at(n).i].recivers[marks->at(n).j + p].signalsArr[marks->at(n).k].x * (marks->at(n).j + p);
-            sum2 += emission.data[marks->at(n).i].recivers[marks->at(n).j + p].signalsArr[marks->at(n).k].x;
-//            sum1 += data[marks[n].i].reciver[marks[n].j + p].signals[marks[n].k].x * (marks[n].j + p);
-//            sum2 += data[marks[n].i].reciver[marks[n].j + p].signals[marks[n].k].x;
+            sum1 += emission->data[marks->at(n).i].recivers[marks->at(n).j + p].signalsArr[marks->at(n).k].x * (marks->at(n).j + p);
+            sum2 += emission->data[marks->at(n).i].recivers[marks->at(n).j + p].signalsArr[marks->at(n).k].x;
         }
         azimuth = sum1 / sum2;
         int coef = 1; // коэффициент для сужения выборки, если было расширение при БПФ до 2 ^ n
         double arg = ((azimuth - coef * countRecivers/2)/ coef) * lambda/(distanceAntenna * countRecivers);
-        targets->at(n).setB((double)180/M_PI * asin(arg));
-//        targets[n].B = (double)180/M_PI * asin(arg);
+        temp.setB((double)180/M_PI * asin(arg));
 
         sum1 = sum2 = 0;
         for(int p = -1; p < 2; p++){
-            sum1 += emission.data[marks->at(n).i].recivers[marks->at(n).j].signalsArr[marks->at(n).k + p].x * (marks->at(n).k + p);
-            sum2 += emission.data[marks->at(n).i].recivers[marks->at(n).j].signalsArr[marks->at(n).k + p].x;
-//            sum1 += data[marks[n].i].reciver[marks[n].j].signals[marks[n].k + p].x * (marks[n].k + p);
-//            sum2 += data[marks[n].i].reciver[marks[n].j].signals[marks[n].k + p].x;
+            sum1 += emission->data[marks->at(n).i].recivers[marks->at(n).j].signalsArr[marks->at(n).k + p].x * (marks->at(n).k + p);
+            sum2 += emission->data[marks->at(n).i].recivers[marks->at(n).j].signalsArr[marks->at(n).k + p].x;
         }
         distance = sum1 / sum2;
-        targets->at(n).setR(distance * ((double)150 / frequencyDeviation));
-        targets->at(n).setA(marks->at(n).value);
-
-//        targets[n].R = distance * ((double)150 / FrequencyDeviation);
-//        targets[n].A = marks[n].value;
+        temp.setR(distance * ((double)150 / frequencyDeviation));
+        temp.setA(marks->at(n).value);
+        targets->push_back(temp);
         n++;
     }
     return 0;
