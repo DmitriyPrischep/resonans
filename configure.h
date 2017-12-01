@@ -4,7 +4,7 @@
 
 static const int countChannels = 256;       // Количество излучений радиосигналов
 static const int countRecivers = 16;        // Количество приемников (антенн)
-static const int countEmission = 128;       // Количество каналов дальности
+static const int countEmission = 512;       // Количество каналов дальности
 
 static const int countTargets = 4;          // Количество целей
 static const int countParametrs = 7;        // Количество параметров цели

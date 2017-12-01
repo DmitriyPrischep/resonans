@@ -106,7 +106,7 @@ void MainWindow::on_pushButton_clicked()
     std::vector<double> windowFunc;
     Windowfunction::funcHammingTukey(&windowFunc);
 
-    imitationTargets(emis, &windowFunc, &targets);
+    horizontalImitation(emis, &windowFunc, &targets);
 
     CFDN(emis);
     dopplerFiltration(emis);
@@ -125,16 +125,17 @@ void MainWindow::on_pushButton_clicked()
     std::vector<Target> resultTargets;
     evalCoordinatesMarks(emis, &marks, &resultTargets);
 
-    int a;
-    a = resultTargets.size();
+//    for(int i = 0; i < countTargets; i++){
+//        std::vector<struct _signal> signalTarget;
+//        verticalImitation(&signalTarget, targets.at(i).getG());
 
+
+//    }
     initializationTable(&resultTargets);
 
 
 //    QSettings *settings = new QSettings("configure.conf", QSettings::IniFormat);
 //    Settings::setValues(settings);
-
-    ////////////////////////////////////////
 
     delete[] emis->data;
 }

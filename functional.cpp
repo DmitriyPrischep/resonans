@@ -139,15 +139,9 @@ void vio(Emission *emission, int indexTn, int indexReciver, int cntChannels, std
 
             d += windowFun->at(j) * (- emission->data[indexTn].recivers[indexReciver].signalsArr[k].x * sin(arg)
                                     + emission->data[indexTn].recivers[indexReciver].signalsArr[k].y * cos(arg));
-//            c += window_fun[j] * (arr[indexTn].reciver[indexReciver].signals[k].x * cos(arg)
-//                                  + arr[indexTn].reciver[indexReciver].signals[k].y * sin(arg));
-//            d += window_fun[j] * (-arr[indexTn].reciver[indexReciver].signals[k].x * sin(arg)
-//                                  + arr[indexTn].reciver[indexReciver].signals[k].y * cos(arg));
         }
         emission->data[indexTn].recivers[indexReciver].signalsArr[i].x = c;
         emission->data[indexTn].recivers[indexReciver].signalsArr[i].y = d;
-//        arr[indexTn].reciver[indexReciver].signals[i].x = c;
-//        arr[indexTn].reciver[indexReciver].signals[i].y = d;
     }
 }
 
@@ -159,7 +153,7 @@ void vio(Emission *emission, int indexTn, int indexReciver, int cntChannels, std
 /// \param [in] Tn - Период повторения сигнала
 /// \param [in] noise - Уровень шума (Sigma)
 /// \param [in] targets - Массив целей
-void imitationTargets(Emission *emission, std::vector<double> *windowFun, std::vector<Target> *targets){
+void horizontalImitation(Emission *emission, std::vector<double> *windowFun, std::vector<Target> *targets){
     double intervals[countRecivers];
     double heights[countRecivers];
 
@@ -197,11 +191,6 @@ void imitationTargets(Emission *emission, std::vector<double> *windowFun, std::v
 
                     if(k >= begin && k <= end && a > 0){
                         double phase = (2 * M_PI/lambda) * (heights[j] + heightSea) * sin(g * piOn180);
-//                        double sumPhase = (2 * M_PI/lambda) * (2 * v * (i * Tn + (k - begin) * (dt/1000)) * intervals[j] * sin(b * piOn180)
-//                                                               + (double)u/2 * (pow(i,2) * pow(Tn,2) + pow(k - begin, 2) * pow((dt/1000),2)))
-//                                + M_PI / lenProbeSignal * pow(0.5 + k - time - (double)lenProbeSignal/2, 2) + f;
-
-
 //                        double arg0 = 2 * M_PI/lambda * (heights[j] + HeightSea) * sin(g * piOn180);
                         double arg = 2 * M_PI/lambda * intervals[j] * sin(b * piOn180);
                         arg += 2 * M_PI/lambda * 2 * v * i * durationWave;
@@ -223,8 +212,6 @@ void imitationTargets(Emission *emission, std::vector<double> *windowFun, std::v
 
                         emission->data[i].recivers[j].signalsArr[k].x += m1 * windowFun->at(k - begin) * a;
                         emission->data[i].recivers[j].signalsArr[k].y += m2 * windowFun->at(k - begin) * a;
-//                        data[i].reciver[j].signals[k].x += m1 * window_fun[k - begin] * a;
-//                        data[i].reciver[j].signals[k].y += m2 * window_fun[k - begin] * a;
                     }
 
                 }
@@ -357,8 +344,6 @@ int CFDN(Emission* emission){
             for(int j = 0; j < countRecivers; j++){
                 temp[j].x = emission->data[i].recivers[j].signalsArr[k].x * windowFun.at(j);
                 temp[j].y = emission->data[i].recivers[j].signalsArr[k].y * windowFun.at(j);
-//                temp[j].x = data[i].reciver[j].signals[k].x * winCFDN[j];
-//                temp[j].y = data[i].reciver[j].signals[k].y * winCFDN[j];
             }
 
             fft(temp, countRecivers, 1);
@@ -366,8 +351,6 @@ int CFDN(Emission* emission){
             for(int j = 0; j < countRecivers; j++){
                 emission->data[i].recivers[j].signalsArr[k].x = temp[j].x;
                 emission->data[i].recivers[j].signalsArr[k].y = temp[j].y;
-//                data[i].reciver[j].signals[k].x = temp[j].x;
-//                data[i].reciver[j].signals[k].y = temp[j].y;
             }
         }
     }
@@ -389,8 +372,6 @@ int dopplerFiltration(Emission* emission){
             for(int i = 0; i < countEmission; i++){
                 temp[i].x = emission->data[i].recivers[j].signalsArr[k].x * windowFun.at(i);
                 temp[i].y = emission->data[i].recivers[j].signalsArr[k].y * windowFun.at(i);
-//                temp[i].x = data[i].reciver[j].signals[k].x * winDopler[i];
-//                temp[i].y = data[i].reciver[j].signals[k].y * winDopler[i];
             }
 
             fft(temp, countEmission, 1);
@@ -398,8 +379,6 @@ int dopplerFiltration(Emission* emission){
             for(int i = 0; i < countEmission; i++){
                 emission->data[i].recivers[j].signalsArr[k].x = temp[i].x;
                 emission->data[i].recivers[j].signalsArr[k].y = temp[i].y;
-//                data[i].reciver[j].signals[k].x = temp[i].x;
-//                data[i].reciver[j].signals[k].y = temp[i].y;
             }
         }
     }
@@ -418,9 +397,6 @@ int detection(Emission* emission){
                 emission->data[i].recivers[j].signalsArr[k].x = sqrt(pow(emission->data[i].recivers[j].signalsArr[k].x, 2) +
                                                                      pow(emission->data[i].recivers[j].signalsArr[k].y, 2));
                 emission->data[i].recivers[j].signalsArr[k].y = 0;
-//                data[i].reciver[j].signals[k].x = sqrt(pow(data[i].reciver[j].signals[k].x, 2)
-//                                                       + pow(data[i].reciver[j].signals[k].y, 2));
-//                data[i].reciver[j].signals[k].y = 0;
             }
         }
     }
@@ -559,24 +535,74 @@ void generateSignal(std::vector<struct _signal>* array, double elevat){
 
 
 
-void verticalImitation(std::vector<struct _signal>* array, double elevat){
-    double phase = 45;
-    double E0 = 50;
+//void verticalImitation(std::vector<struct _signal>* array, double elevat);
+/// \brief - Имитатор для вертикальной антенной решетки
+/// \param [in, out] *emission - Свертка сигнала
+/// \param [in] windowFun - Оконная функция
+/// \param [in] DF - Частота девиации
+/// \param [in] Tn - Период повторения сигнала
+/// \param [in] noise - Уровень шума (Sigma)
+/// \param [in] targets - Массив целей
+void verticalImitation(Emission *emission, std::vector<double> *windowFun, std::vector<Target> *targets){
     double lambda = (double)300/60;
-    double koef = 2 * M_PI / lambda;
-    double param = 180./M_PI;
+    double dt = (double)1/frequencyDeviation;
+    const double piOn180 = (double)M_PI/180;
 
-    double polarPhase = 0;
-    double polarAmplitude = 0;
-    reflectionCoefficient(permittivity, conduct, elevat, lambda, &polarAmplitude, &polarPhase);
+    for(int i = 0; i < countEmission; i++){
+        for(int j = 0; j < cntAntennas; j++){
+            for(int k = 0; k < countChannels; k++){
+                double x, y; // X,Y шума по нормальному распределению
+                noiseGeneration(&x, &y);
+                emission->data[i].recivers[j].signalsArr[k].x = x * noise;
+                emission->data[i].recivers[j].signalsArr[k].y = y * noise;
 
-    for(int i = 0; i < cntVertAE; i++){
-        double arg = - koef * anten[i] * sin(elevat) * phase/param;
-        double arg0 = koef * anten[i] * sin(elevat) * phase/param;
-        struct _signal temp;
-        temp.x = E0 * (cos(arg) + polarAmplitude * cos(arg0 + polarPhase/param));
-        temp.y = E0 * (sin(arg) + polarAmplitude * sin(arg0 + polarPhase/param));
-        array->push_back(temp);
+                for(int t = 0; t < countTargets; t++){
+                    double a = (targets->at(t).getA() <= -100) ? 0 : pow(10, (double)targets->at(t).getA()/20);
+//                    double b = targets->at(t).getB();
+                    double g = targets->at(t).getG();
+                    double r = targets->at(t).getR();
+                    double f = targets->at(t).getF();
+                    double v = targets->at(t).getV();
+                    double u = targets->at(t).getU();
+
+
+                    double vt = r + (v * i * durationWave) /1000.0 + 0.5 * (u * pow(i,2) * pow(durationWave, 2)) /1000.0;
+                    double time = vt / (150 * dt);
+                    int begin = (int)floor(time + 0.49);
+                    int end = begin + lenProbeSignal - 1;
+
+                    if(k >= begin && k <= end && a > 0){
+//                        double phase = (2 * M_PI/lambda) * (heights[j] + heightSea) * sin(g * piOn180);
+//                        double arg0 = 2 * M_PI/lambda * (heights[j] + HeightSea) * sin(g * piOn180);
+                        double arg = 2 * M_PI/lambda * anten[j] * sin(g * piOn180);
+                        arg += 2 * M_PI/lambda * 2 * v * i * durationWave;
+                        arg += 2 * M_PI/lambda * 2 * v * (k - begin) * dt/1000.0;
+                        arg += 2 * M_PI/lambda * (u * pow(i, 2) * pow(durationWave, 2)/2);
+                        arg += 2 * M_PI/lambda * (u * pow((k - begin), 2) * pow((dt/1000.0),2));
+                        arg += M_PI / lenProbeSignal * pow((0.5 + k - time - (double)lenProbeSignal/2), 2) + f;
+
+                        double polarPhase = 0;
+                        double polarAmplitude = 0;
+                        reflectionCoefficient(permittivity, conduct, g, lambda, &polarAmplitude, &polarPhase);
+                        double phase_x = arg;
+                        double phase_y = arg + polarPhase * piOn180;
+
+                        double m1 = cos(phase_x);
+                        m1 += polarAmplitude * cos(phase_y);
+                        double m2 = (sin(phase_x));
+                        m2 += polarAmplitude * sin(phase_y);
+
+                        emission->data[i].recivers[j].signalsArr[k].x += m1 * windowFun->at(k - begin) * a;
+                        emission->data[i].recivers[j].signalsArr[k].y += m2 * windowFun->at(k - begin) * a;
+                    }
+
+                }
+            }
+        }
+        for(int j = 0; j < countRecivers; j++){
+            vio(emission, i, j, countChannels, windowFun);
+        }
+
     }
 }
 
@@ -602,46 +628,38 @@ void CFDN(std::vector<struct _signal>* array, double *elevat, double *amplitude)
     }
 }
 
-void MX(std::vector<struct _signal>* arrayRealSignal, double *elevat, double *amplitude){
+void MX(std::vector<struct _signal>* arrayRealSignal, double *elevat ){
+    double maxAngle = 0;
     for(double angle = 0; angle < 90; angle += 0.1){
         std::vector<struct _signal> arrayModelSignal;
-
         generateSignal(&arrayModelSignal, angle);
 
-        double temp = 0;
+        double sumDifference = 0;
         for(int i = 0; i < cntVertAE; i++){
-            temp += pow(fabs(arrayModelSignal.at(i).x - arrayRealSignal->at(i).x), 2);
-            temp += pow(fabs(arrayModelSignal.at(i).y - arrayRealSignal->at(i).y), 2);
+            double amplitudeRealSignal = sqrt(pow(arrayRealSignal->at(i).x, 2) + pow(arrayRealSignal->at(i).y, 2));
+            double amplitudeModalSignal = sqrt(pow(arrayModelSignal.at(i).x, 2) + pow(arrayModelSignal.at(i).y, 2));
+            double diffAmplitude = pow(fabs(amplitudeModalSignal - amplitudeRealSignal), 2);
+            sumDifference += diffAmplitude;
+        }
+        double sumX = 0;
+        double sumY = 0;
+        for(int i = 0; i < cntVertAE; i++){
+            double differenceSignalX = pow(fabs(arrayModelSignal.at(i).x - arrayRealSignal->at(i).y), 2);
+            double differenceSignalY = pow(fabs(arrayModelSignal.at(i).y - arrayRealSignal->at(i).y), 2);
+            sumX += differenceSignalX;
+            sumY += differenceSignalY;
         }
 
-//        if  (temp > 0)
-//            p = 1. / temp;
-//        else
-//            p = 0;
+        double resultAngle = 0;
+        if(sumDifference > 0 && sumX > 0 && sumY > 0)
+            resultAngle = 2. / sumDifference + 1 / sumX + 1 / sumY;
+        else
+            resultAngle = 0;
 
-//        if()
-
-//        double tt = 0;
-//        for(int i = 0; i < cntVertAE; i++){
-//            double pp = fabs(swh[].x - sw[i].x);
-//            p = pp * pp;
-//            tt = tt + p;
-//        }
-//        for (int i = 0; i < cntVertAE; i++){
-//            double pp = fabs(swh[].y - sw[i].y);
-//            p = pp * pp;
-//            tt = tt + p;
-//        }
-
-//        if (tt > 0)
-//            p = 1./tt;
-//        else
-//            p = 0;
-
-//        if(p > AMX){
-//            Amx = AMX = p;
-//            *elevat = angle;
-//        }
+        if (resultAngle > maxAngle){
+            maxAngle = resultAngle;
+            *elevat = angle * 0.1;
+        }
     }
 }
 

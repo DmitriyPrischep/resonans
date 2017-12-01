@@ -70,18 +70,18 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="113"/>
-        <location filename="../mainwindow.cpp" line="116"/>
+        <location filename="../mainwindow.cpp" line="97"/>
+        <location filename="../mainwindow.cpp" line="100"/>
         <source>Error open file</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="113"/>
+        <location filename="../mainwindow.cpp" line="97"/>
         <source>File does not exist</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.cpp" line="116"/>
+        <location filename="../mainwindow.cpp" line="100"/>
         <source>Error reading file</source>
         <translation type="unfinished"></translation>
     </message>

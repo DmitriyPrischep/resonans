@@ -23,6 +23,5 @@ void Windowfunction::funcHamming(std::vector<double> *winFunction, int size){
     assert(winFunction);
     for(int i = 0; i < size; i++){
         winFunction->push_back(0.54 + 0.46 * cosf(2 * M_PI * (0.5+i-size*0.5)/size));
-//        array[i] = 0.54 + 0.46 * cosf(2 * M_PI * (0.5+i-size*0.5)/size);
     }
 }
