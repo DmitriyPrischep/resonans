@@ -65,58 +65,30 @@ void MyGraphicsView::redrawTimer()
     int centerX = this->width() / 2;
     int centerY = this->height() / 2;
 
-    QBrush redBrush(Qt::red);
     QBrush greenBrush(Qt::green);
     QPen blackPen(Qt::black);
 
     circles->addToGroup(scene->addEllipse(centerX-4, centerY-4, 8, 8, blackPen, greenBrush));
 
     int sideOfSquare = (height > width) ? (width-40) : (height-40);
+
+    int radius = sideOfSquare / 2 ;
     for(int i = 0; i < 400; i+=100){
         circles->addToGroup(scene->addEllipse(centerX - (sideOfSquare/2) + i, centerY - (sideOfSquare/2) + i, sideOfSquare - 2*i, sideOfSquare - 2*i, blackPen));
     }
 
-//    scene->setSceneRect(20, 20, sideOfSquare, sideOfSquare);
-//    centerX = scene->width()/2;
-//    centerY = scene->height()/2;
-
     QPoint point_1(centerX - (sideOfSquare/2), centerY);
     QPoint point_2(centerX + (sideOfSquare/2), centerY);
-    QPoint center(centerX, centerY);
 
-    for(int i = 0; i < 6; i++){
+
+    for(int angle = 0; angle < 180; angle += 30){
+        point_1.setX(centerX + radius * cos(angle * M_PI/180));
+        point_1.setY(centerY + radius * sin(angle * M_PI/180));
+
+        point_2.setX(centerX - radius * cos(angle * M_PI/180));
+        point_2.setY(centerY - radius * sin(angle * M_PI/180));
         sectors->addToGroup(scene->addLine((int)(point_1.x()), (int)(point_1.y()), (int)(point_2.x()), (int)(point_2.y()), blackPen));
-        rotatePoint(&point_1, point_1, center, 30);
-        rotatePoint(&point_2, point_2, center, 30);
     }
-
-//    int sideOfSquare = (height > width) ? (width - 60) : (height - 60);
-//    int centerOfWidget_X = width/2;
-//    int centerOfWidget_Y = height/2;
-//    group_2->addToGroup(scene->addLine(centerOfWidget_X - (sideOfSquare/2),
-//                                       centerOfWidget_Y - (sideOfSquare/2),
-//                                       centerOfWidget_X + (sideOfSquare/2),
-//                                       centerOfWidget_Y - (sideOfSquare/2),
-//                                       penRed));
-
-//    group_2->addToGroup(scene->addLine(centerOfWidget_X + (sideOfSquare/2),
-//                                       centerOfWidget_Y - (sideOfSquare/2),
-//                                       centerOfWidget_X + (sideOfSquare/2),
-//                                       centerOfWidget_Y + (sideOfSquare/2),
-//                                       penRed));
-
-//    group_2->addToGroup(scene->addLine(centerOfWidget_X + (sideOfSquare/2),
-//                                       centerOfWidget_Y + (sideOfSquare/2),
-//                                       centerOfWidget_X - (sideOfSquare/2),
-//                                       centerOfWidget_Y + (sideOfSquare/2),
-//                                       penRed));
-
-//    group_2->addToGroup(scene->addLine(centerOfWidget_X - (sideOfSquare/2),
-//                                       centerOfWidget_Y + (sideOfSquare/2),
-//                                       centerOfWidget_X - (sideOfSquare/2),
-//                                       centerOfWidget_Y - (sideOfSquare/2),
-//                                       penRed));
-
 }
 
 

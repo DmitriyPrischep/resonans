@@ -551,7 +551,7 @@ void verticalImitation(Emission *emission, std::vector<double> *windowFun, std::
     for(int i = 0; i < countEmission; i++){
         for(int j = 0; j < cntAntennas; j++){
             for(int k = 0; k < countChannels; k++){
-                double x, y; // X,Y шума по нормальному распределению
+                double x, y; // X,Y шума по нор мальному распределению
                 noiseGeneration(&x, &y);
                 emission->data[i].recivers[j].signalsArr[k].x = x * noise;
                 emission->data[i].recivers[j].signalsArr[k].y = y * noise;
