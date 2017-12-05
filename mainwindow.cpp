@@ -82,9 +82,9 @@ void MainWindow::viewMessageBox(QString title, QString text){
     msgError.setInformativeText(text);
     msgError.setStandardButtons(QMessageBox::Ok);
     msgError.setDefaultButton(QMessageBox::Ok);
-    QSpacerItem* horizontalSpacer = new QSpacerItem(300, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-    QGridLayout* layout = (QGridLayout*)msgError.layout();
-    layout->addItem(horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
+    //QSpacerItem* horizontalSpacer = new QSpacerItem(300, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+    //QGridLayout* layout = (QGridLayout*)msgError.layout();
+    //layout->addItem(horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
     msgError.exec();
 }
 

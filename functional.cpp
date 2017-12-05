@@ -121,7 +121,6 @@ void reflectionCoefficient(double permittivity, double conduct, double elevat, d
 /// \param [in] windowFun - Оконная функция
 void vio(Emission *emission, int indexTn, int indexReciver, int cntChannels, std::vector<double> *windowFun){
     /////////////////////////////////// ДОПИСАТЬ ASSERT
-//    assert();
     float arg = 0;
     int kl = (int) (lenProbeSignal + 0.1);
 

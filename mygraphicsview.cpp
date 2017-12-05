@@ -30,29 +30,6 @@ MyGraphicsView::~MyGraphicsView()
 
 }
 
-float function(int value){
-    return 0.6 * pow(value, 2) + 100;
-}
-
-
-int rotatePoint_1(QPoint *outPoint, QPoint *inPoint, QPoint *center, int angle){
-    if (!outPoint){
-        return -1;
-    }
-    outPoint->setX((int)(center->x() + (inPoint->x() - center->x()) * cos(angle * M_PI/180) - (inPoint->y() - center->y()) * sin(angle*M_PI/180)));
-    outPoint->setY((int)(center->y() + (inPoint->y() - center->y()) * cos(angle * M_PI/180) + (inPoint->x() - center->y()) * sin(angle*M_PI/180)));
-    return 0;
-}
-
-int rotatePoint(QPoint *outPoint, QPoint inPoint, QPoint center, int angle){
-    if (!outPoint){
-        return -1;
-    }
-    outPoint->setX((int)(center.x() + (inPoint.x() - center.x()) * cos(angle * M_PI/180) - (inPoint.y() - center.y()) * sin(angle*M_PI/180)));
-    outPoint->setY((int)(center.y() + (inPoint.y() - center.y()) * cos(angle * M_PI/180) + (inPoint.x() - center.y()) * sin(angle*M_PI/180)));
-    return 0;
-}
-
 void MyGraphicsView::redrawTimer()
 {
     this->deleteItemsFromGroup(circles);
