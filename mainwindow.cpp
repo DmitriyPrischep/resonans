@@ -63,8 +63,8 @@ void MainWindow::initializationTable(std::vector<Target> *targets){
 //        item = new QStandardItem(QString(targets->at(i).getF()));
 //        model->setItem(i, 4, item);
 
-//        item = new QStandardItem(QString(targets->at(i).getG()));
-//        model->setItem(i, 5, item);
+        item = new QStandardItem(QString::number(targets->at(i).getG(), 'f', 2));
+        model->setItem(i, 5, item);
 
 //        item = new QStandardItem(QString(targets->at(i).getU()));
 //        model->setItem(i, 6, item);
@@ -109,7 +109,7 @@ void MainWindow::on_pushButton_clicked()
     horizontalImitation(emis, &windowFunc, &targets);
 
     CFDN(emis);
-    dopplerFiltration(emis);
+    dopplerFiltration(emis, countRecivers);
     detection(emis);
 
     std::vector<struct azimuth> azimuths;
@@ -125,24 +125,71 @@ void MainWindow::on_pushButton_clicked()
     std::vector<Target> resultTargets;
     evalCoordinatesMarks(emis, &marks, &resultTargets);
 
+    Emission* emisVertical = new Emission(countEmission);
+    verticalImitation(emisVertical, &windowFunc, &targets);
+
+    dopplerFiltration(emisVertical, countVertRecivers);
+
+    calculateElevation(emisVertical, &marks, &resultTargets);
+
 //    for(int i = 0; i < countTargets; i++){
 //        std::vector<struct _signal> signalTarget;
 //        verticalImitation(&signalTarget, targets.at(i).getG());
-
-
 //    }
-    initializationTable(&resultTargets);
 
+    initializationTable(&resultTargets);
 
 //    QSettings *settings = new QSettings("configure.conf", QSettings::IniFormat);
 //    Settings::setValues(settings);
-
     delete[] emis->data;
+    delete[] emisVertical->data;
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    picture = new MyGraphicsView();
+
+    Emission* emisVertical = new Emission(countEmission);
+    std::vector<Target> targets;
+    int code = readDataQt("targets.txt", &targets);
+    std::vector<double> windowFunc;
+    Windowfunction::funcHammingTukey(&windowFunc);
+    verticalImitation(emisVertical, &windowFunc, &targets);
+
+//    Emission* emis = new Emission(countEmission);
+//    std::vector<Target> targets;
+//    int code = readDataQt("targets.txt", &targets);
+//    std::vector<double> windowFunc;
+//    Windowfunction::funcHammingTukey(&windowFunc);
+//    horizontalImitation(emis, &windowFunc, &targets);
+    double angle = 1.80;
+
+    writeDataQt("data_graphics.txt", emisVertical);
+
+
+
+
+//    double a[] = {2.380, 4.532, 5.967, 6.763, 6.302, 4.444, 1.652, -1.659};
+//    double b[] = {-1.168, -2.292, -3.242, -3.647, -3.655, -2.595, -1.113, 0.643};
+
+//    float a[] = {-0.51, -0.82, -0.94, -0.79, -0.31, 0.38, 0.79, 0.91};
+//    float b[] = {0.82, 1.49, 1.75, 1.58, 0.56, -0.58, -1.51, -1.71};
+    /* TEST ON MX()
+    //Угол 1.8 град
+    float a[] = {0.18, 0.34, 0.52, 0.69, 0.89, 1.07, 1.26, 1.42};
+    float b[] = {-0.10, -0.19, -0.32, -0.38, -0.54, -0.65, -0.74, -0.86};
+    std::vector<struct _signal> array;
+    for(int j = 0; j < countVertRecivers; j++){
+        struct _signal temp = {0, 0};
+        temp.x = a[j];
+        temp.y = b[j];
+        array.push_back(temp);
+    }
+    double e;
+    MX(&array, &e);
+    e += 1 - 1;
+    */
+
+//    picture = new MyGraphicsView();
 //    //Движение цели
 //    int startX = -20;
 //    int startY = -20;

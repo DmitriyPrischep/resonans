@@ -9,9 +9,30 @@
 #include "configure.h"
 #include "windowfunction.h"
 
-//int writeDataQt(QString path){
+float module(float x, float y){
+    float res = sqrt(pow(x, 2) + pow(y, 2));
+    return res;
+}
 
-//}
+int writeDataQt(QString path, Emission *emission){
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)){
+        qDebug() << "Error opening file";
+        return 1;
+    }
+    QTextStream writeStream(&file);
+
+    for(int i = 0; i < countEmission; i++){
+        for(int j = 0; j < countRecivers; j++){
+            for(int k = 0; k < countChannels; k++){
+                writeStream << k << "\t" << j << "\t"
+                            << module(emission->data[i].recivers[j].signalsArr[k].x, emission->data[i].recivers[j].signalsArr[k].y) <<"\n" ;
+            }
+        }
+    }
+    file.close();
+    return 0;
+}
 
 
 int readDataQt(QString path, std::vector<Target> *targets){
@@ -67,7 +88,7 @@ void  noiseGeneration(double *x, double *y){
 /// \param [in] pol_v_y - Вертикальная поляризация по Y
 /// \param [in] pol_h_x - Горизонтальная поляризация по Х
 /// \param [in] pol_h_y - Горизонтальная поляризация по Y
-void reflectionCoefficient(double permittivity, double conduct, double elevat, double lamda, double *pol_h_x, double *pol_h_y)/*float *pol_v_x, float *pol_v_y,*/ {
+void reflectionCoefficient(double permittivity, double conduct, double elevat, double lamda, double *pol_h_x, double *pol_h_y, double *pol_v_x, double *pol_v_y) {
     double angle = elevat * M_PI / 180;
     double sin_angle = sin(angle);
 
@@ -81,20 +102,20 @@ void reflectionCoefficient(double permittivity, double conduct, double elevat, d
     double px = tmp * cos(arctan),
             py = tmp * sin(arctan);
 
-//    double f10x = permittivity * sin_angle - px;
-//    double f10y = par2 * sin_angle - py;
+    double f10x = permittivity * sin_angle - px;
+    double f10y = par2 * sin_angle - py;
 
     double pxx = permittivity * sin_angle + px,
             pyy = par2 * sin_angle + py;
 
     // Вертикаль
     double zn = pow(pxx, 2) + pow(pyy, 2);
-/*
+
     double f1x = (f10x * pxx + f10y * pyy)/zn,
             f1y = (-f10x * pyy + f10y * pxx)/zn;
     *pol_v_x = sqrt(pow(f1x, 2) + pow(f1y, 2));
     *pol_v_y = - atan2(f1y, f1x) * 180.0 / M_PI;
-*/
+
     // Горизонталь
     double f20x = sin_angle - px,
             f20y = - py;
@@ -133,10 +154,10 @@ void vio(Emission *emission, int indexTn, int indexReciver, int cntChannels, std
 
             arg = (M_PI / kl) * pow((1 + j - (kl + 1) / 2.0), 2);
 
-            c += windowFun->at(j) * (  emission->data[indexTn].recivers[indexReciver].signalsArr[k].x * cos(arg)
+            c += windowFun->at(j)*  (  emission->data[indexTn].recivers[indexReciver].signalsArr[k].x * cos(arg)
                                     + emission->data[indexTn].recivers[indexReciver].signalsArr[k].y * sin(arg));
 
-            d += windowFun->at(j) * (- emission->data[indexTn].recivers[indexReciver].signalsArr[k].x * sin(arg)
+            d += windowFun->at(j)* (- emission->data[indexTn].recivers[indexReciver].signalsArr[k].x * sin(arg)
                                     + emission->data[indexTn].recivers[indexReciver].signalsArr[k].y * cos(arg));
         }
         emission->data[indexTn].recivers[indexReciver].signalsArr[i].x = c;
@@ -200,7 +221,9 @@ void horizontalImitation(Emission *emission, std::vector<double> *windowFun, std
 
                         double polarPhase = 0;
                         double polarAmplitude = 0;
-                        reflectionCoefficient(permittivity, conduct, g, lambda, &polarAmplitude, &polarPhase);
+                        double verticalPhase = 0;
+                        double verticalAmplitude = 0;
+                        reflectionCoefficient(permittivity, conduct, g, lambda, &polarAmplitude, &polarPhase, &verticalAmplitude, &verticalPhase);
                         double phase_x = arg + phase,
                                phase_y = arg - phase + polarPhase * piOn180;
 
@@ -358,13 +381,14 @@ int CFDN(Emission* emission){
 
 /// \brief - Доплеровская фильтрация
 /// \param [in, out] *emission - Свертка сигнала
-int dopplerFiltration(Emission* emission){
+/// \param [in, out] countAE - Количество антенных элементов
+int dopplerFiltration(Emission* emission, int countAE){
     if(!emission)
         return 1;
     std::vector<double> windowFun;
     Windowfunction::funcHamming(&windowFun, countEmission);
 
-    for(int j = 0; j < countRecivers; j++){
+    for(int j = 0; j < countAE; j++){
         for(int k = 0; k < countChannels; k++){
             struct _signal temp[countEmission];
 
@@ -514,20 +538,22 @@ int evalCoordinatesMarks(Emission *emission, std::vector<struct mark>* marks, st
 void generateSignal(std::vector<struct _signal>* array, double elevat){
     double phase = 45;
     double E0 = 50;
-    double lambda = (double)300/60;
+    double lambda = (double)300/67.5;
     double koef = 2 * M_PI / lambda;
     double param = 180./M_PI;
 
     double polarPhase = 0;
     double polarAmplitude = 0;
-    reflectionCoefficient(permittivity, conduct, elevat, lambda, &polarAmplitude, &polarPhase);
+    double verticalPhase = 0;
+    double verticalAmplitude = 0;
+    reflectionCoefficient(permittivity, conduct, elevat, lambda, &polarAmplitude, &polarPhase, &verticalAmplitude, &verticalPhase);
 
-    for(int i = 0; i < cntVertAE; i++){
-        double arg = - koef * anten[i] * sin(elevat) * phase/param;
-        double arg0 = koef * anten[i] * sin(elevat) * phase/param;
+    for(int i = 0; i < countVertRecivers; i++){
+        double arg = - koef * anten[i] * sin(elevat/param);
+        double arg0 = koef * anten[i] * sin(elevat/param);
         struct _signal temp;
-        temp.x = E0 * (cos(arg) + polarAmplitude * cos(arg0 + polarPhase/param));
-        temp.y = E0 * (sin(arg) + polarAmplitude * sin(arg0 + polarPhase/param));
+        temp.x = cos(arg) + polarAmplitude * cos(arg0 + polarPhase/param);
+        temp.y = sin(arg) + polarAmplitude * sin(arg0 + polarPhase/param);
         array->push_back(temp);
     }
 }
@@ -543,7 +569,7 @@ void generateSignal(std::vector<struct _signal>* array, double elevat){
 /// \param [in] noise - Уровень шума (Sigma)
 /// \param [in] targets - Массив целей
 void verticalImitation(Emission *emission, std::vector<double> *windowFun, std::vector<Target> *targets){
-    double lambda = (double)300/60;
+    double lambda = (double)300/60;   /// ВЫНЕСТИ в const
     double dt = (double)1/frequencyDeviation;
     const double piOn180 = (double)M_PI/180;
 
@@ -557,7 +583,7 @@ void verticalImitation(Emission *emission, std::vector<double> *windowFun, std::
 
                 for(int t = 0; t < countTargets; t++){
                     double a = (targets->at(t).getA() <= -100) ? 0 : pow(10, (double)targets->at(t).getA()/20);
-//                    double b = targets->at(t).getB();
+                    double cos_b = cos(targets->at(t).getB() * piOn180);
                     double g = targets->at(t).getG();
                     double r = targets->at(t).getR();
                     double f = targets->at(t).getF();
@@ -573,37 +599,55 @@ void verticalImitation(Emission *emission, std::vector<double> *windowFun, std::
                     if(k >= begin && k <= end && a > 0){
 //                        double phase = (2 * M_PI/lambda) * (heights[j] + heightSea) * sin(g * piOn180);
 //                        double arg0 = 2 * M_PI/lambda * (heights[j] + HeightSea) * sin(g * piOn180);
-                        double arg = 2 * M_PI/lambda * anten[j] * sin(g * piOn180);
-                        arg += 2 * M_PI/lambda * 2 * v * i * durationWave;
+
+                        double phase = 0.0;
+                        if (j >= cntAntennas / 2)
+                            phase = 2 * M_PI/lambda * anten[j - cntAntennas / 2] * sin(g * piOn180);
+                        else
+                            phase = 2 * M_PI/lambda * anten[j] * sin(g * piOn180);
+//
+                        double arg = 2 * M_PI/lambda * 2 * v * i * durationWave;
                         arg += 2 * M_PI/lambda * 2 * v * (k - begin) * dt/1000.0;
                         arg += 2 * M_PI/lambda * (u * pow(i, 2) * pow(durationWave, 2)/2);
                         arg += 2 * M_PI/lambda * (u * pow((k - begin), 2) * pow((dt/1000.0),2));
                         arg += M_PI / lenProbeSignal * pow((0.5 + k - time - (double)lenProbeSignal/2), 2) + f;
 
-                        double polarPhase = 0;
+                        double gorizontalPhase = 0;
                         double polarAmplitude = 0;
-                        reflectionCoefficient(permittivity, conduct, g, lambda, &polarAmplitude, &polarPhase);
-                        double phase_x = arg;
-                        double phase_y = arg + polarPhase * piOn180;
+                        double verticalPhase = 0;
+                        double verticalAmplitude = 0;
+                        reflectionCoefficient(permittivity, conduct, g, lambda, &polarAmplitude, &gorizontalPhase, &verticalAmplitude, &verticalPhase);
 
-                        double m1 = cos(phase_x);
-                        m1 += polarAmplitude * cos(phase_y);
-                        double m2 = (sin(phase_x));
-                        m2 += polarAmplitude * sin(phase_y);
-
-                        emission->data[i].recivers[j].signalsArr[k].x += m1 * windowFun->at(k - begin) * a;
-                        emission->data[i].recivers[j].signalsArr[k].y += m2 * windowFun->at(k - begin) * a;
+                        double m1 = 0;
+                        double m2 = 0;
+                        if(j >= 8){
+//                            double phase_x = arg;
+//                            double phase_y = arg + verticalPhase * piOn180;
+//                            m1 = cos(phase_x);
+//                            m1 += verticalAmplitude * cos(phase_y);
+//                            m2 = (sin(phase_x));
+//                            m2 += polarAmplitude * sin(phase_y);
+                        } else {
+                            double phase_x = arg + phase;
+                            double phase_y = arg - phase + gorizontalPhase * piOn180;
+                            m1 = cos(phase_x);
+                            m1 += polarAmplitude * cos(phase_y);
+                            m2 = (sin(phase_x));
+                            m2 += polarAmplitude * sin(phase_y);
+                        }
+                        emission->data[i].recivers[j].signalsArr[k].x += m1 * a * cos_b * windowFun->at(k - begin);
+                        emission->data[i].recivers[j].signalsArr[k].y += m2 * a * cos_b * windowFun->at(k - begin);
                     }
-
                 }
             }
         }
-        for(int j = 0; j < countRecivers; j++){
+        for(int j = 0; j < cntAntennas; j++){
             vio(emission, i, j, countChannels, windowFun);
         }
 
     }
 }
+
 
 void CFDN(std::vector<struct _signal>* array, double *elevat, double *amplitude){
     double max = 0;
@@ -611,7 +655,7 @@ void CFDN(std::vector<struct _signal>* array, double *elevat, double *amplitude)
     for(double i = 0; i < 90; i += 0.1){
         double p = 0;
         double pp = 0;
-        for(int j = 0; i < cntVertAE; i++){
+        for(int j = 0; i < countVertRecivers; i++){
             double arg = (2 * M_PI/lambda) * anten[j]*sin(i);
             double co = cos(arg);
             double si = sin(arg);
@@ -634,7 +678,7 @@ void MX(std::vector<struct _signal>* arrayRealSignal, double *elevat ){
         generateSignal(&arrayModelSignal, angle);
 
         double sumDifference = 0;
-        for(int i = 0; i < cntVertAE; i++){
+        for(int i = 0; i < countVertRecivers; i++){
             double amplitudeRealSignal = sqrt(pow(arrayRealSignal->at(i).x, 2) + pow(arrayRealSignal->at(i).y, 2));
             double amplitudeModalSignal = sqrt(pow(arrayModelSignal.at(i).x, 2) + pow(arrayModelSignal.at(i).y, 2));
             double diffAmplitude = pow(fabs(amplitudeModalSignal - amplitudeRealSignal), 2);
@@ -642,7 +686,7 @@ void MX(std::vector<struct _signal>* arrayRealSignal, double *elevat ){
         }
         double sumX = 0;
         double sumY = 0;
-        for(int i = 0; i < cntVertAE; i++){
+        for(int i = 0; i < countVertRecivers; i++){
             double differenceSignalX = pow(fabs(arrayModelSignal.at(i).x - arrayRealSignal->at(i).y), 2);
             double differenceSignalY = pow(fabs(arrayModelSignal.at(i).y - arrayRealSignal->at(i).y), 2);
             sumX += differenceSignalX;
@@ -657,11 +701,30 @@ void MX(std::vector<struct _signal>* arrayRealSignal, double *elevat ){
 
         if (resultAngle > maxAngle){
             maxAngle = resultAngle;
-            *elevat = angle * 0.1;
+            *elevat = angle;
         }
     }
 }
 
+
+void calculateElevation(Emission *emission, std::vector<struct mark>* marks, std::vector<Target> *targets){
+    if(!targets || !marks || !emission)
+        return;
+
+    for(unsigned int i = 0; i < marks->size(); i++){
+        std::vector<struct _signal> array;
+        for(int j = 0; j < countVertRecivers; j++){
+            struct _signal temp = {0, 0};
+            temp.x = emission->data[marks->at(i).i].recivers[j].signalsArr[marks->at(i).k].x;
+            temp.y = emission->data[marks->at(i).i].recivers[j].signalsArr[marks->at(i).k].y;
+            array.push_back(temp);
+        }
+
+        double elevat;
+        MX(&array, &elevat);
+        targets->at(i).setG(elevat);
+    }
+}
 
 
 
