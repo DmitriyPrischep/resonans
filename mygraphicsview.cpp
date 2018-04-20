@@ -16,8 +16,8 @@ MyGraphicsView::MyGraphicsView(QWidget *parent)
     circles = new QGraphicsItemGroup();
     sectors = new QGraphicsItemGroup();
 
-    scene->addItem(circles);
     scene->addItem(sectors);
+    scene->addItem(circles);
 
     timer = new QTimer();
 

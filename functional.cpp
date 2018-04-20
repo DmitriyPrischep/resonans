@@ -22,7 +22,6 @@ int writeDataQt(QString path, Emission *emission){
     }
     QTextStream writeStream(&file);
 
-    int reciver = 1;
     for(int i = 0; i < countEmission; i++){
         for(int j = 0; j < countRecivers; j++){
             for(int k = 0; k < countChannels; k++){
@@ -683,6 +682,41 @@ void MX(std::vector<struct _signal>* arrayRealSignal, double *elevat ){
         std::vector<struct _signal> arrayModelSignal;
         generateSignal(&arrayModelSignal, angle);
 
+        //Signal normalization by amplitude
+        double normRealSg = 0;
+        double normModelSg = 0;
+        for(int i = 0; i < countVertRecivers; i++){
+            normModelSg += sqrt(pow(arrayModelSignal.at(i).x,2) + pow(arrayModelSignal.at(i).y,2));
+            normRealSg += sqrt(pow(arrayRealSignal->at(i).x ,2) + pow(arrayRealSignal->at(i).y,2));
+        }
+
+        for(int i = 0; i < countVertRecivers; i++){
+            arrayModelSignal.at(i).x /= normModelSg;
+            arrayModelSignal.at(i).y /= normModelSg;
+            arrayRealSignal->at(i).x /= normRealSg;
+            arrayRealSignal->at(i).y /= normRealSg;
+        }
+
+        //Signal normalization by phase
+        double phaseReferenceModel = atan2(arrayModelSignal.at(1).y, arrayModelSignal.at(1).x);
+        double phaseReferenceReal = atan2(arrayRealSignal->at(1).y, arrayRealSignal->at(1).x);
+        double cosPhaseRefModel = cos(phaseReferenceModel);
+        double sinPhaseRefModel = sin(phaseReferenceModel);
+        double cosPhaseRefReal = cos(phaseReferenceReal);
+        double sinPhaseRefReal = sin(phaseReferenceReal);
+
+        for(int i = 0; i < countVertRecivers; i++){
+            double x = arrayModelSignal.at(i).x * cosPhaseRefModel + arrayModelSignal.at(i).y * sinPhaseRefModel;
+            double y = - arrayModelSignal.at(i).x * sinPhaseRefModel + arrayModelSignal.at(i).y * cosPhaseRefModel;
+            arrayModelSignal.at(i).x = x;
+            arrayModelSignal.at(i).y = y;
+
+            x = arrayRealSignal->at(i).x * cosPhaseRefReal + arrayRealSignal->at(i).y * sinPhaseRefReal;
+            y = - arrayRealSignal->at(i).x * sinPhaseRefReal + arrayRealSignal->at(i).y * cosPhaseRefReal;
+            arrayRealSignal->at(i).x = x;
+            arrayRealSignal->at(i).y = y;
+        }
+
         double sumDifference = 0;
         for(int i = 0; i < countVertRecivers; i++){
             double amplitudeRealSignal = sqrt(pow(arrayRealSignal->at(i).x, 2) + pow(arrayRealSignal->at(i).y, 2));
@@ -693,7 +727,7 @@ void MX(std::vector<struct _signal>* arrayRealSignal, double *elevat ){
         double sumX = 0;
         double sumY = 0;
         for(int i = 0; i < countVertRecivers; i++){
-            double differenceSignalX = pow(fabs(arrayModelSignal.at(i).x - arrayRealSignal->at(i).y), 2);
+            double differenceSignalX = pow(fabs(arrayModelSignal.at(i).x - arrayRealSignal->at(i).x), 2);
             double differenceSignalY = pow(fabs(arrayModelSignal.at(i).y - arrayRealSignal->at(i).y), 2);
             sumX += differenceSignalX;
             sumY += differenceSignalY;

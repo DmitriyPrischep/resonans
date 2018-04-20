@@ -9,23 +9,23 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="142"/>
+        <location filename="../mainwindow.ui" line="31"/>
         <location filename="../mainwindow.cpp" line="21"/>
         <source>File targets:</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="168"/>
+        <location filename="../mainwindow.ui" line="112"/>
         <source>Test</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="119"/>
+        <location filename="../mainwindow.ui" line="65"/>
         <source>...</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../mainwindow.ui" line="155"/>
+        <location filename="../mainwindow.ui" line="119"/>
         <source>Calculate</source>
         <translation type="unfinished"></translation>
     </message>

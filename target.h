@@ -15,25 +15,25 @@ private:
 public:
     Target();
     void setA(double value){ this->A = value; }
-    getA(){ return this->A;}
+    double getA(){ return this->A;}
 
     void setR(double value){ this->R = value; }
-    getR(){ return this->R;}
+    double getR(){ return this->R;}
 
     void setB(double value){ this->B = value; }
-    getB(){ return this->B;}
+    double getB(){ return this->B;}
 
     void setV(double value){ this->V = value; }
-    getV(){ return this->V;}
+    double getV(){ return this->V;}
 
     void setF(double value){ this->F = value; }
-    getF(){ return this->F;}
+    double getF(){ return this->F;}
 
     void setG(double value){ this->G = value; }
-    getG(){ return this->G;}
+    double getG(){ return this->G;}
 
     void setU(double value){ this->U = value; }
-    getU(){ return this->U;}
+    double getU(){ return this->U;}
 };
 
 #endif // TARGET_H

@@ -63,7 +63,7 @@ void MainWindow::initializationTable(std::vector<Target> *targets){
 //        item = new QStandardItem(QString(targets->at(i).getF()));
 //        model->setItem(i, 4, item);
 
-        item = new QStandardItem(QString::number(targets->at(i).getG(), 'f', 2));
+        item = new QStandardItem(QString::number(targets->at(i).getG()));
         model->setItem(i, 5, item);
 
 //        item = new QStandardItem(QString(targets->at(i).getU()));
@@ -121,12 +121,9 @@ void MainWindow::on_pushButton_clicked()
 
     marksSelection(emis, &azimuths, &marks);
 
-    qDebug() << "  Mark size is " + marks.size();
-
     std::vector<Target> resultTargets;
 
     evalCoordinatesMarks(emis, &marks, &resultTargets);
-
 
     Emission* emisVertical = new Emission(countEmission);
     verticalImitation(emisVertical, &windowFunc, &targets);
@@ -134,14 +131,6 @@ void MainWindow::on_pushButton_clicked()
     dopplerFiltration(emisVertical, countVertRecivers);
 
     calculateElevation(emisVertical, &marks, &resultTargets);
-
-    double e;
-    e += 1 - 1;
-
-//    for(int i = 0; i < countTargets; i++){
-//        std::vector<struct _signal> signalTarget;
-//        verticalImitation(&signalTarget, targets.at(i).getG());
-//    }
 
     initializationTable(&resultTargets);
 
@@ -154,12 +143,12 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::on_pushButton_2_clicked()
 {
 
-    Emission* emisVertical = new Emission(countEmission);
-    std::vector<Target> targets;
-    int code = readDataQt("targets.txt", &targets);
-    std::vector<double> windowFunc;
-    Windowfunction::funcHammingTukey(&windowFunc);
-    verticalImitation(emisVertical, &windowFunc, &targets);
+//    Emission* emisVertical = new Emission(countEmission);
+//    std::vector<Target> targets;
+//    int code = readDataQt("targets.txt", &targets);
+//    std::vector<double> windowFunc;
+//    Windowfunction::funcHammingTukey(&windowFunc);
+//    verticalImitation(emisVertical, &windowFunc, &targets);
 
 //    Emission* emis = new Emission(countEmission);
 //    std::vector<Target> targets;
@@ -167,9 +156,8 @@ void MainWindow::on_pushButton_2_clicked()
 //    std::vector<double> windowFunc;
 //    Windowfunction::funcHammingTukey(&windowFunc);
 //    horizontalImitation(emis, &windowFunc, &targets);
-    double angle = 1.80;
 
-    writeDataQt("data_graphics.txt", emisVertical);
+//    writeDataQt("data_graphics.txt", emisVertical);
 
 
 
