@@ -110,6 +110,7 @@ void MainWindow::on_pushButton_clicked()
 
     CFDN(emis);
     dopplerFiltration(emis, countRecivers);
+    writeDataQt("data_graphics.txt", emis);
     detection(emis);
 
     std::vector<struct azimuth> azimuths;
@@ -123,7 +124,9 @@ void MainWindow::on_pushButton_clicked()
     qDebug() << "  Mark size is " + marks.size();
 
     std::vector<Target> resultTargets;
+
     evalCoordinatesMarks(emis, &marks, &resultTargets);
+
 
     Emission* emisVertical = new Emission(countEmission);
     verticalImitation(emisVertical, &windowFunc, &targets);
@@ -131,6 +134,9 @@ void MainWindow::on_pushButton_clicked()
     dopplerFiltration(emisVertical, countVertRecivers);
 
     calculateElevation(emisVertical, &marks, &resultTargets);
+
+    double e;
+    e += 1 - 1;
 
 //    for(int i = 0; i < countTargets; i++){
 //        std::vector<struct _signal> signalTarget;

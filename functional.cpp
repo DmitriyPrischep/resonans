@@ -22,11 +22,12 @@ int writeDataQt(QString path, Emission *emission){
     }
     QTextStream writeStream(&file);
 
+    int reciver = 1;
     for(int i = 0; i < countEmission; i++){
         for(int j = 0; j < countRecivers; j++){
             for(int k = 0; k < countChannels; k++){
-                writeStream << k << "\t" << j << "\t"
-                            << module(emission->data[i].recivers[j].signalsArr[k].x, emission->data[i].recivers[j].signalsArr[k].y) <<"\n" ;
+                writeStream << k << "\t" << i << "\t"
+                        << module(emission->data[i].recivers[j].signalsArr[k].x, emission->data[i].recivers[j].signalsArr[k].y) <<"\n" ;
             }
         }
     }
@@ -504,17 +505,24 @@ int evalCoordinatesMarks(Emission *emission, std::vector<struct mark>* marks, st
     while (n < marks->size()){
         double sum1 = 0, sum2 = 0;
         Target temp;
+        int i;
+        if(marks->at(n).i < countEmission/2)
+            i = marks->at(n).i;
+        else
+            i = marks->at(n).i - countEmission/2;
+
         for(int p = -1; p < 2; p++){
-            sum1 += emission->data[marks->at(n).i + p].recivers[marks->at(n).j].signalsArr[marks->at(n).k].x * (marks->at(n).i + p);
-            sum2 += emission->data[marks->at(n).i + p].recivers[marks->at(n).j].signalsArr[marks->at(n).k].x;
+            sum1 += emission->data[i + p].recivers[marks->at(n).j].signalsArr[marks->at(n).k].x * (i + p);
+            sum2 += emission->data[i + p].recivers[marks->at(n).j].signalsArr[marks->at(n).k].x;
         }
         velocity = sum1 / sum2;
-        temp.setV(lambda / 2 * velocity *((1.0/durationWave)/countEmission));
+        double v  = lambda / 2 * velocity *(100./countEmission);
+        temp.setV(v);
 
         sum1 = sum2 = 0;
         for(int p = -1; p < 2; p++){
-            sum1 += emission->data[marks->at(n).i].recivers[marks->at(n).j + p].signalsArr[marks->at(n).k].x * (marks->at(n).j + p);
-            sum2 += emission->data[marks->at(n).i].recivers[marks->at(n).j + p].signalsArr[marks->at(n).k].x;
+            sum1 += emission->data[i].recivers[marks->at(n).j + p].signalsArr[marks->at(n).k].x * (marks->at(n).j + p);
+            sum2 += emission->data[i].recivers[marks->at(n).j + p].signalsArr[marks->at(n).k].x;
         }
         azimuth = sum1 / sum2;
         int coef = 1; // коэффициент для сужения выборки, если было расширение при БПФ до 2 ^ n
@@ -523,8 +531,8 @@ int evalCoordinatesMarks(Emission *emission, std::vector<struct mark>* marks, st
 
         sum1 = sum2 = 0;
         for(int p = -1; p < 2; p++){
-            sum1 += emission->data[marks->at(n).i].recivers[marks->at(n).j].signalsArr[marks->at(n).k + p].x * (marks->at(n).k + p);
-            sum2 += emission->data[marks->at(n).i].recivers[marks->at(n).j].signalsArr[marks->at(n).k + p].x;
+            sum1 += emission->data[i].recivers[marks->at(n).j].signalsArr[marks->at(n).k + p].x * (marks->at(n).k + p);
+            sum2 += emission->data[i].recivers[marks->at(n).j].signalsArr[marks->at(n).k + p].x;
         }
         distance = sum1 / sum2;
         temp.setR(distance * ((double)150 / frequencyDeviation));
@@ -536,9 +544,7 @@ int evalCoordinatesMarks(Emission *emission, std::vector<struct mark>* marks, st
 }
 
 void generateSignal(std::vector<struct _signal>* array, double elevat){
-    double phase = 45;
-    double E0 = 50;
-    double lambda = (double)300/67.5;
+    double lambda = (double)300./60;
     double koef = 2 * M_PI / lambda;
     double param = 180./M_PI;
 
@@ -695,7 +701,7 @@ void MX(std::vector<struct _signal>* arrayRealSignal, double *elevat ){
 
         double resultAngle = 0;
         if(sumDifference > 0 && sumX > 0 && sumY > 0)
-            resultAngle = 2. / sumDifference + 1 / sumX + 1 / sumY;
+            resultAngle = 1. / sumDifference + 1. / sumX + 1. / sumY;
         else
             resultAngle = 0;
 
@@ -718,6 +724,10 @@ void calculateElevation(Emission *emission, std::vector<struct mark>* marks, std
             temp.x = emission->data[marks->at(i).i].recivers[j].signalsArr[marks->at(i).k].x;
             temp.y = emission->data[marks->at(i).i].recivers[j].signalsArr[marks->at(i).k].y;
             array.push_back(temp);
+        }
+
+        for(unsigned int ind = 0; ind < array.size(); ind++){
+            qDebug() << ind << "    " <<array.at(ind).x << "    " << array.at(ind).y;
         }
 
         double elevat;
