@@ -103,10 +103,11 @@ void MainWindow::on_pushButton_clicked()
 
     Emission* emis = new Emission(countEmission);
 
-    std::vector<double> windowFunc;
+    std::vector<float> windowFunc;
     Windowfunction::funcHammingTukey(&windowFunc);
 
     horizontalImitation(emis, &windowFunc, &targets);
+    writeDataQt("data_graphics.txt", emis);
 
     CFDN(emis);
     dopplerFiltration(emis, countRecivers);

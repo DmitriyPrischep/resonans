@@ -4,23 +4,23 @@
 #include "stddef.h"
 
 struct azimuth{
-    double avg;     //Среднее арифметическое по азимуту
-    double sigma;   //Среднеквадратичное отклонение
-    double border;  //Порог
+    float avg;     //Среднее арифметическое по азимуту
+    float sigma;   //Среднеквадратичное отклонение
+    float border;  //Порог
 };
 
 struct mark{
     int i;
     int j;
     int k;
-    double value;
+    float value;
     int size;
 };
 
 
 struct _signal{
-    double x;
-    double y;
+    float x;
+    float y;
 };
 struct reciver{
     struct _signal signalsArr[countChannels];

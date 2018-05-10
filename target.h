@@ -5,35 +5,35 @@
 class Target
 {
 private:
-    double A;  // Амплитуды целей      (dB)
-    double R;  // Дальности до целей   (km)
-    double B;  // Азимуты целей        (grad)
-    double V;  // Скрорость целей      (m/s)
-    double F;  // Начальная фаза целей (rad)
-    double G;  // Угол места целей     (grad)
-    double U;  // Ускорение целей      (m/(s*s))
+    float A;  // Амплитуды целей      (dB)
+    float R;  // Дальности до целей   (km)
+    float B;  // Азимуты целей        (grad)
+    float V;  // Скрорость целей      (m/s)
+    float F;  // Начальная фаза целей (rad)
+    float G;  // Угол места целей     (grad)
+    float U;  // Ускорение целей      (m/(s*s))
 public:
     Target();
-    void setA(double value){ this->A = value; }
-    double getA(){ return this->A;}
+    void setA(float value){ this->A = value; }
+    float getA(){ return this->A;}
 
-    void setR(double value){ this->R = value; }
-    double getR(){ return this->R;}
+    void setR(float value){ this->R = value; }
+    float getR(){ return this->R;}
 
-    void setB(double value){ this->B = value; }
-    double getB(){ return this->B;}
+    void setB(float value){ this->B = value; }
+    float getB(){ return this->B;}
 
-    void setV(double value){ this->V = value; }
-    double getV(){ return this->V;}
+    void setV(float value){ this->V = value; }
+    float getV(){ return this->V;}
 
-    void setF(double value){ this->F = value; }
-    double getF(){ return this->F;}
+    void setF(float value){ this->F = value; }
+    float getF(){ return this->F;}
 
-    void setG(double value){ this->G = value; }
-    double getG(){ return this->G;}
+    void setG(float value){ this->G = value; }
+    float getG(){ return this->G;}
 
-    void setU(double value){ this->U = value; }
-    double getU(){ return this->U;}
+    void setU(float value){ this->U = value; }
+    float getU(){ return this->U;}
 };
 
 #endif // TARGET_H
