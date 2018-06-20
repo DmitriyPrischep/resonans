@@ -27,9 +27,12 @@ HEADERS  += mainwindow.h \
     emission.h \
     windowfunction.h \
     configure.h \
-    mygraphicsview.h
+    mygraphicsview.h \
+    fftw3.h
 
 FORMS    += mainwindow.ui
+
+LIBS += "$$PWD/../program/libfftw3-3.dll"
 
 TRANSLATIONS += \
     languages/program_ru.ts \

@@ -8,6 +8,12 @@
 #include "emission.h"
 #include "configure.h"
 #include "windowfunction.h"
+#include "fftw3.h"
+#include "QVector"
+
+
+#define REAL 0
+#define IMAG 1
 
 float module(float x, float y){
     float res = sqrtf(powf(x, 2) + powf(y, 2));
@@ -187,7 +193,7 @@ void horizontalImitation(Emission *emission, std::vector<float> *windowFun, std:
     const float piOn180 = (float)M_PI/180;
 
     for(int i = 0; i < countEmission; i++){
-        int st, fin = 0;
+//        int st, fin = 0;
         for(int j = 0; j < countRecivers; j++){
             for(int k = 0; k < countChannels; k++){
                 float x, y; // X,Y шума по нормальному распределению
@@ -210,7 +216,7 @@ void horizontalImitation(Emission *emission, std::vector<float> *windowFun, std:
                     int begin = (int)floorf(time + 0.49);
                     int end = begin + lenProbeSignal - 1;
 
-                    st = begin; fin = end;
+//                    st = begin; fin = end;
 
                     if(k >= begin && k <= end && a > 0){
                         float phase = (2 * M_PI/lambda) * (heights[j] + heightSea) * sinf(g * piOn180);
@@ -266,6 +272,21 @@ void swapping(struct _signal array[], int n){
         temp.y = array[i].y;
         array[i].y = array[part + i].y;
         array[part + i].y = temp.y;
+    }
+}
+
+void swapping(fftw_complex array[], int n){
+    assert(n > 0);
+    int part = n / 2;
+    for(int i = 0; i < part; i++){
+        fftw_complex temp;
+        temp[REAL] = array[i][REAL];
+        array[i][REAL] = array[part + i][REAL];
+        array[part + i][REAL] = temp[REAL];
+
+        temp[IMAG] = array[i][IMAG];
+        array[i][IMAG] = array[part + i][IMAG];
+        array[part + i][IMAG] = temp[IMAG];
     }
 }
 
@@ -362,25 +383,31 @@ void fft(struct _signal in[], int n, int p){
 int CFDN(Emission* emission){
     if(!emission)
         return 1;
+    fftw_plan plan;
     std::vector<float> windowFun;
     Windowfunction::funcHamming(&windowFun, countRecivers);
     for(int i = 0; i < countEmission; i++){
         for(int k = 0; k < countChannels; k++){
-            struct _signal temp[countRecivers];
 
+            fftw_complex temp[countRecivers];
             for(int j = 0; j < countRecivers; j++){
-                temp[j].x = emission->data[i].recivers[j].signalsArr[k].x * windowFun.at(j);
-                temp[j].y = emission->data[i].recivers[j].signalsArr[k].y * windowFun.at(j);
+                temp[j][REAL] = emission->data[i].recivers[j].signalsArr[k].x * windowFun.at(j);
+                temp[j][IMAG] = emission->data[i].recivers[j].signalsArr[k].y * windowFun.at(j);
             }
 
-            fft(temp, countRecivers, 1);
+            plan = fftw_plan_dft_1d(countRecivers, temp, temp, FFTW_FORWARD, FFTW_ESTIMATE);
+            fftw_execute(plan);
+
+            swapping(temp, countRecivers);
 
             for(int j = 0; j < countRecivers; j++){
-                emission->data[i].recivers[j].signalsArr[k].x = temp[j].x;
-                emission->data[i].recivers[j].signalsArr[k].y = temp[j].y;
+                emission->data[i].recivers[j].signalsArr[k].x = temp[j][REAL];
+                emission->data[i].recivers[j].signalsArr[k].y = temp[j][IMAG];
             }
         }
     }
+    fftw_destroy_plan(plan);
+    fftw_cleanup();
     return 0;
 }
 
@@ -390,26 +417,37 @@ int CFDN(Emission* emission){
 int dopplerFiltration(Emission* emission, int countAE){
     if(!emission)
         return 1;
+    fftw_plan plan;
     std::vector<float> windowFun;
     Windowfunction::funcHamming(&windowFun, countEmission);
 
     for(int j = 0; j < countAE; j++){
         for(int k = 0; k < countChannels; k++){
-            struct _signal temp[countEmission];
+            //struct _signal temp[countEmission];
+            fftw_complex temp[countEmission];
 
             for(int i = 0; i < countEmission; i++){
-                temp[i].x = emission->data[i].recivers[j].signalsArr[k].x * windowFun.at(i);
-                temp[i].y = emission->data[i].recivers[j].signalsArr[k].y * windowFun.at(i);
+//                temp[i].x = emission->data[i].recivers[j].signalsArr[k].x * windowFun.at(i);
+//                temp[i].y = emission->data[i].recivers[j].signalsArr[k].y * windowFun.at(i);
+                temp[i][REAL] = emission->data[i].recivers[j].signalsArr[k].x * windowFun.at(i);
+                temp[i][IMAG] = emission->data[i].recivers[j].signalsArr[k].y * windowFun.at(i);
             }
 
-            fft(temp, countEmission, 1);
+            plan = fftw_plan_dft_1d(countEmission, temp, temp, FFTW_FORWARD, FFTW_ESTIMATE);
+            fftw_execute(plan);
+            swapping(temp, countEmission);
+//            fft(temp, countEmission, 1);
 
             for(int i = 0; i < countEmission; i++){
-                emission->data[i].recivers[j].signalsArr[k].x = temp[i].x;
-                emission->data[i].recivers[j].signalsArr[k].y = temp[i].y;
+//                emission->data[i].recivers[j].signalsArr[k].x = temp[i].x;
+//                emission->data[i].recivers[j].signalsArr[k].y = temp[i].y;
+                emission->data[i].recivers[j].signalsArr[k].x = temp[i][REAL];
+                emission->data[i].recivers[j].signalsArr[k].y = temp[i][IMAG];
             }
         }
     }
+    fftw_destroy_plan(plan);
+    fftw_cleanup();
     return 0;
 }
 
@@ -757,10 +795,6 @@ void calculateElevation(Emission *emission, std::vector<struct mark>* marks, std
             temp.x = emission->data[marks->at(i).i].recivers[j].signalsArr[marks->at(i).k].x;
             temp.y = emission->data[marks->at(i).i].recivers[j].signalsArr[marks->at(i).k].y;
             array.push_back(temp);
-        }
-
-        for(unsigned int ind = 0; ind < array.size(); ind++){
-            qDebug() << ind << "    " <<array.at(ind).x << "    " << array.at(ind).y;
         }
 
         float elevat;

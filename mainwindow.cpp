@@ -29,6 +29,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_btnFileDialog_clicked()
 {
+
+
     setPath(QFileDialog::getOpenFileName(this, trUtf8("Open file targets"), "", "*.txt"));
     ui->editPath->setText(getPath());
 }
@@ -90,6 +92,9 @@ void MainWindow::viewMessageBox(QString title, QString text){
 
 void MainWindow::on_pushButton_clicked()
 {
+    QTime t;
+    t.start();
+
     std::vector<Target> targets;
     int code = readDataQt(this->getPath(), &targets);
     if(code != 0){
@@ -107,11 +112,11 @@ void MainWindow::on_pushButton_clicked()
     Windowfunction::funcHammingTukey(&windowFunc);
 
     horizontalImitation(emis, &windowFunc, &targets);
-    writeDataQt("data_graphics.txt", emis);
+//    writeDataQt("data_graphics.txt", emis);
 
     CFDN(emis);
     dopplerFiltration(emis, countRecivers);
-    writeDataQt("data_graphics.txt", emis);
+//    writeDataQt("data_graphics.txt", emis);
     detection(emis);
 
     std::vector<struct azimuth> azimuths;
@@ -139,6 +144,8 @@ void MainWindow::on_pushButton_clicked()
 //    Settings::setValues(settings);
     delete[] emis->data;
     delete[] emisVertical->data;
+
+    qDebug() << "Time: " << t.elapsed() << " ms\n";
 }
 
 void MainWindow::on_pushButton_2_clicked()
